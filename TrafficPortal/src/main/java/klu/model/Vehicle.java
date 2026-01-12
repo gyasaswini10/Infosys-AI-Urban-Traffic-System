@@ -48,6 +48,17 @@ public class Vehicle {
     @Column(name = "last_service")
     String lastServiceDate;
 
+    @Column(name = "userid")
+    String userid; // Link to the user who registered it (Email)
+
+    public String getUserid() {
+        return userid;
+    }
+
+    public void setUserid(String userid) {
+        this.userid = userid;
+    }
+
     public Long getVehicleId() {
         return vehicleId;
     }

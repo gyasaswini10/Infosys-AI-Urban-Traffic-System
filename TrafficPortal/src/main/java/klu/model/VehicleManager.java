@@ -56,4 +56,33 @@ public class VehicleManager {
         stats.put("inactive", VR.countByStatus(2));
         return stats;
     }
+
+    public String updateVehicleStatus(Map<String, Object> data) {
+        try {
+            Long vehicleId = Long.parseLong(data.get("vehicleId").toString());
+            int status = Integer.parseInt(data.get("status").toString());
+
+            Vehicle V = VR.findById(vehicleId).get();
+            V.setStatus(status);
+            VR.save(V);
+
+            if (status == 1)
+                return "200::Vehicle Approved/Activated";
+            if (status == 4)
+                return "200::Vehicle Rejected";
+            return "200::Status Updated";
+        } catch (Exception e) {
+            return "500::Error Updating Status: " + e.getMessage();
+        }
+    }
+
+    public String deleteVehicle(Map<String, Object> data) {
+        try {
+            Long vehicleId = Long.parseLong(data.get("vehicleId").toString());
+            VR.deleteById(vehicleId);
+            return "200::Vehicle Deleted Successfully";
+        } catch (Exception e) {
+            return "500::Error Deleting Vehicle: " + e.getMessage();
+        }
+    }
 }

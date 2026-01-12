@@ -37,4 +37,14 @@ public class VehicleController {
         return vm.getVehicleStats();
     }
 
+    @PostMapping("/updateStatus")
+    public String updateStatus(@RequestBody Map<String, Object> data) {
+        return vm.updateVehicleStatus(data);
+    }
+
+    @PostMapping("/delete")
+    public String delete(@RequestBody Map<String, Object> data) {
+        return vm.deleteVehicle(data);
+    }
+
 }

@@ -20,7 +20,8 @@ export default class Dashboard extends Component {
       fullname: "",
       role:0,
       activeComponent:null,
-      manualMenus: []
+      manualMenus: [],
+      userid: null
     }
     this.logout=this.logout.bind(this);
     this.loadComponent=this.loadComponent.bind(this);
@@ -34,7 +35,7 @@ export default class Dashboard extends Component {
     
     callApi("POST", "http://localhost:8080/users/getdetails", JSON.stringify({"csrid":sid}), (res)=> {
         let user = JSON.parse(res);
-        this.setState({role: user.role});
+        this.setState({role: user.role, userid: user.email});
         this.showFullname(user.fullname);
 
         // Define Menus based on Role (Manual Override for Security/UX)
@@ -49,7 +50,7 @@ export default class Dashboard extends Component {
                  {mid: "2", menu: "Traffic Search", icon: "images/searchicon.png"},
                  {mid: "3", menu: "My Profile", icon: "images/user.png"}
              ];
-             this.setState({activeComponent: <AdminDashboard role={user.role}/>});
+             this.setState({activeComponent: <AdminDashboard role={user.role} userid={user.userid}/>});
         } else if(user.role === 2) { // Manager
              roleMenus = [
                  {mid: "1", menu: "Fleet Dashboard", icon: "images/list.png"},
@@ -84,7 +85,7 @@ export default class Dashboard extends Component {
   loadComponent(mid) {
     // Dynamic Component Loading
     if(mid === "1") {
-        this.setState({activeComponent: <AdminDashboard role={this.state.role}/>});
+        this.setState({activeComponent: <AdminDashboard role={this.state.role} userid={this.state.userid}/>});
         return;
     }
     if(mid === "6") { // Manager Post Incident
