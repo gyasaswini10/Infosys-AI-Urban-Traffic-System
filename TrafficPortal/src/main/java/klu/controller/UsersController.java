@@ -13,39 +13,44 @@ import org.springframework.web.bind.annotation.RestController;
 
 import klu.model.Users;
 import klu.model.UsersManager;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/users")
 public class UsersController {
-	
+
 	@Autowired
 	UsersManager um;
-	
-	
+
 	@PostMapping("/signup")
-	public String signup(@RequestBody Users U)
-	{
+	public String signup(@RequestBody Users U) {
 		return um.addUser(U);
 	}
-	
+
 	@PostMapping("/signin")
-	  public String signin(@RequestBody Users U) {
-		return um.ValidateCredentials(U.getEmail(),U.getPassword());
-	  }
-	
+	public String signin(@RequestBody Users U) {
+		return um.ValidateCredentials(U.getEmail(), U.getPassword());
+	}
+
 	@GetMapping("/forgotpassword/{email}")
-	  public String forgotPassword(@PathVariable("email") String emailid) {
-	    
-	    return um.recoverPassword(emailid);
-	  }
-	
-	
+	public String forgotPassword(@PathVariable("email") String emailid) {
+
+		return um.recoverPassword(emailid);
+	}
+
 	@PostMapping("/getfullname")
-	public String getFullname(@RequestBody Map<String, String> data)
-	{
+	public String getFullname(@RequestBody Map<String, String> data) {
 		return um.getFullname(data.get("csrid"));
+	}
+
+	@PostMapping("/getdetails")
+	public Users getUserDetails(@RequestBody Map<String, String> data) {
+		return um.getUserDetails(data.get("csrid"));
+	}
+
+	@PostMapping("/update")
+	public String updateUser(@RequestBody Users U) {
+		return um.updateUser(U);
 	}
 
 }

@@ -1,0 +1,340 @@
+.admin-dashboard {
+    padding: 20px;
+    font-family: 'Inter', sans-serif;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* Metrics Cards */
+.metrics-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.metric-card {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+}
+
+.metric-info h3 {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #8898aa;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.metric-info h1 {
+    margin: 10px 0 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #32325d;
+}
+
+.icon-box {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.total-blue {
+    background: #e6f1ff;
+    color: #007aff;
+}
+
+.active-green {
+    background: #e6fffa;
+    color: #00cc88;
+}
+
+.inactive-red {
+    background: #ffebee;
+    color: #f5365c;
+}
+
+/* Vehicle List */
+.vehicle-section {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.section-header h2 {
+    margin: 0;
+    color: #32325d;
+}
+
+.btn-add {
+    background: linear-gradient(to right, #11cdef, #1171ef);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.vehicle-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.vehicle-table th {
+    text-align: left;
+    padding: 15px;
+    background-color: #f6f9fc;
+    color: #8898aa;
+    font-weight: 600;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.vehicle-table td {
+    padding: 15px;
+    border-bottom: 1px solid #e9ecef;
+    color: #525f7f;
+}
+
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-active {
+    background: #e6fffa;
+    color: #00cc88;
+}
+
+.status-inactive {
+    background: #ffebee;
+    color: #f5365c;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 400px;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #525f7f;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Vehicle Grid Layout */
+.vehicle-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 10px 0;
+}
+
+.vehicle-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid #e5e7eb;
+}
+
+.vehicle-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.card-id {
+    font-size: 0.85rem;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.vehicle-card h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #111827;
+}
+
+.reg-no {
+    color: #6b7280;
+    margin: 5px 0 15px 0;
+    font-size: 0.95rem;
+}
+
+/* Telemetry Row */
+.telemetry-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.telemetry-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #374151;
+    font-size: 0.9rem;
+}
+
+.telemetry-item i {
+    font-size: 1rem;
+}
+
+.location-icon {
+    color: #3b82f6;
+}
+
+.speed-icon {
+    color: #f59e0b;
+}
+
+/* Battery Section */
+.battery-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.battery-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    color: #4b5563;
+}
+
+.battery-label i {
+    color: #10b981;
+    margin-right: 5px;
+}
+
+.battery-bar-bg {
+    width: 100%;
+    height: 8px;
+    background-color: #e5e7eb;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.battery-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease-in-out, background-color 0.3s;
+}
+
+/* View Switcher */
+.btn-view {
+    background: white;
+    border: 1px solid #d1d5db;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    color: #374151;
+    transition: all 0.2s;
+    margin-right: -1px;
+}
+
+.btn-view:first-child {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.btn-view:last-of-type {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.btn-view.active {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+    z-index: 1;
+}
+
+.btn-view:hover:not(.active) {
+    background: #f3f4f6;
+}

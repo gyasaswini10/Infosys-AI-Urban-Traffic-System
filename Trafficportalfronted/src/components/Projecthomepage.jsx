@@ -12,6 +12,7 @@ export class Homepage extends Component {
     this.userRegistration=this.userRegistration.bind(this);
     this.forgotPassword=this.forgotPassword.bind(this);
     this.signin=this.signin.bind(this);
+this.forgotPasswordResponse=this.forgotPasswordResponse.bind(this);
 
   }
   showSignin(){
@@ -65,47 +66,46 @@ export class Homepage extends Component {
         let  signuppassword = document.getElementById("signuppassword");
         let confirmpassword = document.getElementById("confirmpassword");
 
+        let missingFields = [];
+
         fullname.style.border = "";
         email.style.border = "";
         role.style.border = "";
         signuppassword.style.border = "";
         confirmpassword.style.border = "";
-        if(fullname.value=="")
-        {
+
+        if(fullname.value.trim() === "") {
           fullname.style.border = "1px solid red";
-          fullname.focus();
+          missingFields.push("Full Name");
+        }
+        if(email.value.trim() === "") {
+          email.style.border = "1px solid red";
+          missingFields.push("Email");
+        }
+        if(role.value === "") {
+          role.style.border = "1px solid red";
+          missingFields.push("Role");
+        }
+        if(signuppassword.value === "") {
+          signuppassword.style.border = "1px solid red";
+          missingFields.push("Password");
+        }
+        if(confirmpassword.value === "") {
+          confirmpassword.style.border = "1px solid red";
+          missingFields.push("Confirm Password");
+        }
+
+        if(missingFields.length > 0) {
+          alert("Please fill the following fields: " + missingFields.join(", "));
           return;
         }
-        if(email.value=="")
-          {
-            email.style.border = "1px solid red";
-            email.focus();
-            return;
-          }
-          if(role.value=="")
-            {
-              role.style.border = "1px solid red";
-              role.focus();
-              return;
-            }
-            if(signuppassword.value=="")
-              {
-                signuppassword.style.border = "1px solid red";
-                signuppassword.focus();
-                return;
-              }
-              if(confirmpassword.value=="")
-                {
-                  confirmpassword.style.border = "1px solid red";
-                  confirmpassword.focus();
-                  return;
-                }
-                if(signuppassword.value !== confirmpassword.value)
-                {
-                  signuppassword.style.border = "1px solid red";
-                  signuppassword.focus();
-                  return;
-                }
+
+        if(signuppassword.value !== confirmpassword.value) {
+           alert("Passwords do not match!");
+           signuppassword.style.border = "1px solid red";
+           confirmpassword.style.border = "1px solid red";
+           return;
+        }
 
   
 
@@ -141,28 +141,35 @@ export class Homepage extends Component {
     callApi("GET", url,"",this.forgotPasswordResponse);
   }
   forgotPasswordResponse(res){
-    let data=res.split('::');
-    if(data[0]==="200")
-      responseDiv.innerHTML=`<br/><br/><label style='color:green'>${data[1]}</label>`;
-    else 
-    responseDiv.innerHTML=`<br/><br/><label style='color:red'>${data[1]}</label>`;
+  let responseDiv=document.getElementById("responseDiv");
+  let data=res.split("::");
 
+  if(data[0]==="200")
+    responseDiv.innerHTML=`<label style='color:green'>${data[1]}</label>`;
+  else
+    responseDiv.innerHTML=`<label style='color:red'>${data[1]}</label>`;
 
   }
 
   signin(){
-    username.style.border="";
-    password.style.border="";
-    responseDiv.innerHTML="";
-    if(username.value===""){
-      username.style.border="1px solid red";
-      username.focus();
-      return;
+    let missingFields = [];
+
+    username.style.border = "";
+    password.style.border = "";
+    responseDiv.innerHTML = "";
+
+    if (username.value.trim() === "") {
+        username.style.border = "1px solid red";
+        missingFields.push("Email");
     }
-    if(password.value===""){
-      password.style.border="1px solid red";
-      password.focus();
-      return;
+    if (password.value === "") {
+        password.style.border = "1px solid red";
+        missingFields.push("Password");
+    }
+
+    if (missingFields.length > 0) {
+        alert("Please fill the following fields: " + missingFields.join(", "));
+        return;
     }
     let data=JSON.stringify({
       email:username.value,
@@ -191,7 +198,7 @@ export class Homepage extends Component {
             <div className='popupWindow'>
              <div id ='popupHeader'>LogIn</div>
              <div id ='signin'>
-              <label className='usernameLabel'>Username</label>
+              <label className='usernameLabel'>Email</label>
               <input type='text' id='username'/>
               <label className='passwordLabel'>Password</label>
               <input type='password' id='password'/>
@@ -215,8 +222,9 @@ export class Homepage extends Component {
             <select id='role'>
               <option value=''></option>
               <option value='1'>Admin</option>
-              <option value='2'>Traffic Police</option>
-              <option value='3'>Citizen</option>
+              <option value='2'>Manager</option>
+              <option value='3'>Driver</option>
+              <option value='4'>Customer</option>
             </select>
             <label>Password :</label>  
             <input type='password' id='signuppassword'/>

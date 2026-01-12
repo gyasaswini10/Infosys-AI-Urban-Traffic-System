@@ -12,7 +12,7 @@ public class EmailManager {
 		public String sendEmail (String toEamil,String subject,  String message) {
 			try {
 				SimpleMailMessage mailMessage =new SimpleMailMessage();
-				mailMessage.setFrom("jeenepallyadiseshu@gmail.com");
+				mailMessage.setFrom("gyasu1110@gmail.com");
 				mailMessage.setTo(toEamil);
 				mailMessage.setSubject(subject);
 				mailMessage.setText(message);

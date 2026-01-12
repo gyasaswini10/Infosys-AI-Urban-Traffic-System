@@ -9,10 +9,19 @@ export default class MenuBar extends Component {
     this.loadMenus = this.loadMenus.bind(this);
   }
   componentDidMount(){
-    let csr=getSession("csrid");
-    let data = JSON.stringify({csrid:csr});
-    callApi("POST", BASEURL + "menus/getmenusbyrole", data, this.loadMenus);
-    // callApi("POST", BASEURL + "menus/getmenus", "", this.loadMenus)
+    if(this.props.manualMenus && this.props.manualMenus.length > 0) {
+        this.setState({menuItems: this.props.manualMenus});
+    } else {
+        let csr=getSession("csrid");
+        let data = JSON.stringify({csrid:csr});
+        callApi("POST", BASEURL + "menus/getmenusbyrole", data, this.loadMenus);
+    }
+  }
+  
+  componentDidUpdate(prevProps) {
+      if(this.props.manualMenus !== prevProps.manualMenus && this.props.manualMenus) {
+          this.setState({menuItems: this.props.manualMenus});
+      }
   }
   loadMenus(response){
     let data = JSON.parse(response);
@@ -24,12 +33,12 @@ export default class MenuBar extends Component {
     return (
       <div className="menubar">
         <div className="menuheader">
-          MENU <img src="/images/menu.png" alt="" />
+          MENU <img src="\images\smart traffic .jpg" alt="" />
         </div>
         <div className="menulist">
           <ul>
           {menuItems.map((row) =>(
-            <li onClick={()=>this.props.onMenuClick(row.mid)}>
+            <li key={row.mid} onClick={()=>this.props.onMenuClick(row.mid)}>
               {row.menu} <img src = {row.icon} alt='' />
             </li>
             ))}
