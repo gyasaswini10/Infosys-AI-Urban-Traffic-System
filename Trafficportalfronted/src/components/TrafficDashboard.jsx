@@ -1,96 +1,190 @@
 import React, { Component } from 'react';
-import '../css/AdminDashboard.css'; // Reusing CSS for cards and layout
+import '../css/AdminDashboard.css';
 import { BASEURL, callApi } from '../api';
+
+// Chart.js
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Bar } from 'react-chartjs-2';
+
+// Leaflet
+import 'leaflet/dist/leaflet.css';
+import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
+import L from 'leaflet';
+
+// PDF Export
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
+
+// Register ChartJS
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
+// Fix Leaflet Marker Icon
+ delete L.Icon.Default.prototype._getIconUrl;
+ L.Icon.Default.mergeOptions({
+   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+ });
 
 export default class TrafficDashboard extends Component {
     constructor() {
         super();
         this.state = {
-            stats: {
-                total: 0,
-                high: 0,
-                medium: 0,
-                low: 0,
-                critical: 0
+            stats: { total: 0, active: 0, inactive: 0 },
+            vehicles: [],
+            hourlyData: {
+                labels: ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00'],
+                datasets: [
+                  {
+                    label: 'Trips Started',
+                    data: [12, 19, 3, 5, 2, 3, 10], // Mock Data for MVP
+                    backgroundColor: 'rgba(53, 162, 235, 0.5)',
+                  },
+                ],
             },
-            recentIncidents: []
+            loading: true
         };
-        this.loadStats = this.loadStats.bind(this);
-        this.loadRecent = this.loadRecent.bind(this);
+        this.exportReport = this.exportReport.bind(this);
     }
 
     componentDidMount() {
-        callApi("GET", BASEURL + "traffic/stats", "", this.loadStats);
-        callApi("GET", BASEURL + "traffic/read", "", this.loadRecent);
+        // Fetch Fleet Statistics
+        callApi("GET", BASEURL + "vehicle/stats", null, (data) => {
+             this.setState({ stats: JSON.parse(data) });
+        });
+
+        // Fetch Fleet Locations for Heatmap
+        callApi("GET", BASEURL + "vehicle/all", null, (data) => {
+            this.setState({ vehicles: JSON.parse(data), loading: false });
+        });
     }
 
-    loadStats(response) {
-        try {
-            let data = JSON.parse(response);
-            this.setState({ stats: data });
-        } catch(e) { console.error(e); }
-    }
+    exportReport() {
+        const doc = new jsPDF();
+        doc.text("Urban Mobility Insights Report", 20, 10);
+        
+        const { stats, vehicles } = this.state;
+        
+        // Summary
+        doc.text(`Total Fleet: ${stats.total}`, 20, 20);
+        doc.text(`Active Vehicles: ${stats.active}`, 20, 30);
+        
+        // Vehicle Table
+        const tableColumn = ["ID", "Reg No", "Model", "Status", "Location"];
+        const tableRows = [];
 
-    loadRecent(response) {
-        try {
-            let data = JSON.parse(response);
-            this.setState({ recentIncidents: data });
-        } catch(e) { console.error(e); }
+        vehicles.forEach(vehicle => {
+            const vehicleData = [
+                vehicle.vehicleId,
+                vehicle.regNo,
+                vehicle.model,
+                vehicle.status === 1 ? "Active" : "Inactive",
+                vehicle.location
+            ];
+            tableRows.push(vehicleData);
+        });
+
+        doc.autoTable(tableColumn, tableRows, { startY: 40 });
+        doc.save("mobility_report.pdf");
     }
 
     render() {
-        const { stats, recentIncidents } = this.state;
+        const { stats, vehicles, hourlyData, loading } = this.state;
+
+        if (loading) return <div>Loading Analytics...</div>;
+
+        // Calculate center for map (simple average of visible points or hardcoded city center)
+        const center = [17.3850, 78.4867]; // Hyderabad coords as default
+
         return (
             <div className="admin-dashboard">
                 <div className="dashboard-header">
-                    <h2>Traffic Analysis Dashboard</h2>
+                    <h2>Urban Mobility Insights</h2>
+                    <button className="btn-add" onClick={this.exportReport}>
+                        <i className="fas fa-download"></i> Export Report
+                    </button>
                 </div>
 
+                {/* KPI Cards */}
                 <div className="stats-container">
-                    <div className="stat-card total">
-                        <h3>Total Incidents</h3>
+                    <div className="stat-card" style={{background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)'}}>
+                        <h3>Total Fleet</h3>
                         <p>{stats.total}</p>
                     </div>
-                    <div className="stat-card active" style={{background: 'linear-gradient(135deg, #FF5252, #D32F2F)'}}>
-                        <h3>Critical/High</h3>
-                        <p>{(stats.high || 0) + (stats.critical || 0)}</p>
+                    <div className="stat-card" style={{background: 'linear-gradient(135deg, #10b981, #047857)'}}>
+                        <h3>Active Routes</h3>
+                        <p>{stats.active}</p>
                     </div>
-                    <div className="stat-card inactive" style={{background: 'linear-gradient(135deg, #FFCA28, #F57C00)'}}>
-                        <h3>Medium/Low</h3>
-                        <p>{(stats.medium || 0) + (stats.low || 0)}</p>
+                    <div className="stat-card" style={{background: 'linear-gradient(135deg, #f59e0b, #d97706)'}}>
+                        <h3>Trips Today</h3>
+                        <p>{stats.active * 12 + 5} <small style={{fontSize:'0.5em'}}>(Est)</small></p>
                     </div>
                 </div>
 
-                <div className="vehicle-list-container">
-                    <h3>Recent Incidents</h3>
-                    <div className="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Location</th>
-                                    <th>Type</th>
-                                    <th>Severity</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {recentIncidents.map((inc) => (
-                                    <tr key={inc.id}>
-                                        <td>{inc.title}</td>
-                                        <td>{inc.location}</td>
-                                        <td>{inc.type}</td>
-                                        <td>
-                                            <span className={inc.severity === 'High' || inc.severity === 'Critical' ? 'status-inactive' : 'status-active'}
-                                                style={{padding: '5px 10px', borderRadius: '15px'}}
-                                            >
-                                                {inc.severity}
-                                            </span>
-                                        </td>
-                                    </tr>
+                <div className="analytics-grid" style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'20px', marginTop:'20px'}}>
+                    
+                    {/* Fleet Heatmap / Map Distribution */}
+                    <div className="card-panel" style={{background:'white', padding:'20px', borderRadius:'10px', boxShadow:'0 2px 5px rgba(0,0,0,0.1)'}}>
+                        <h3>Fleet Distribution Heatmap</h3>
+                        <div style={{height: '400px', width: '100%'}}>
+                            <MapContainer center={center} zoom={12} style={{ height: '100%', width: '100%' }}>
+                                <TileLayer
+                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                />
+                                {vehicles.map(v => (
+                                    // Randomize lat/lng slightly if "location" is just a city name, or map city names to coords
+                                    // For MVP, assuming "Garage" or city names map to near center, 
+                                    // normally v.location would be lat,lng. 
+                                    // I'll simulate distribution around center.
+
+                                        <Circle 
+                                            center={[
+                                                center[0] + (Math.random() - 0.5) * 0.1, 
+                                                center[1] + (Math.random() - 0.5) * 0.1
+                                            ]}
+                                            pathOptions={{ fillColor: v.status===1?'green':'red', color: v.status===1?'green':'red' }}
+                                            radius={500}
+                                            key={v.vehicleId}
+                                        >
+                                            <Popup>
+                                                <b>{v.regNo}</b><br/>
+                                                {v.model}<br/>
+                                                Status: {v.status === 1 ? 'Active' : 'Idle'}
+                                            </Popup>
+                                        </Circle>
+
                                 ))}
-                            </tbody>
-                        </table>
+                            </MapContainer>
+                        </div>
                     </div>
+
+                    {/* Hourly Activity Chart */}
+                    <div className="card-panel" style={{background:'white', padding:'20px', borderRadius:'10px', boxShadow:'0 2px 5px rgba(0,0,0,0.1)'}}>
+                        <h3>Hourly Rental Activity</h3>
+                        <Bar options={{
+                            responsive: true,
+                            plugins: {
+                                legend: { position: 'top' },
+                            },
+                        }} data={hourlyData} />
+                    </div>
+
                 </div>
             </div>
         );

@@ -16,6 +16,10 @@ public class VehicleManager {
 
     public String addVehicle(Vehicle V) {
         try {
+            if (VR.existsByRegNo(V.getRegNo())) {
+                return "409::Vehicle with Reg No " + V.getRegNo() + " already exists";
+            }
+
             // Check for duplicates if needed, but regNo is unique
             if (V.getLocation() == null || V.getLocation().isEmpty())
                 V.setLocation("Garage"); // Default location

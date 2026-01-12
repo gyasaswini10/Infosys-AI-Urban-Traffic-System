@@ -13,4 +13,6 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
     @Query("select count(v) from Vehicle v where v.status=:status")
     public long countByStatus(@Param("status") int status);
 
+    public boolean existsByRegNo(String regNo);
+
 }
