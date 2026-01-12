@@ -25,22 +25,27 @@ public class MaintenanceController {
 
         for (Vehicle v : vehicles) {
             Map<String, Object> record = new HashMap<>();
+            // Handle potential nulls with defaults
+            int engineHealth = v.getEngineHealth() != null ? v.getEngineHealth() : 100;
+            int tireHealth = v.getTireHealth() != null ? v.getTireHealth() : 100;
+            double mileage = v.getMileage() != null ? v.getMileage() : 0.0;
+
             record.put("vehicleId", v.getVehicleId());
             record.put("regNo", v.getRegNo());
-            record.put("engineHealth", v.getEngineHealth());
-            record.put("tireHealth", v.getTireHealth());
-            record.put("mileage", v.getMileage());
+            record.put("engineHealth", engineHealth);
+            record.put("tireHealth", tireHealth);
+            record.put("mileage", mileage);
 
             // Prediction Logic
             List<String> issues = new ArrayList<>();
             String status = "Healthy";
             String action = "None";
 
-            if (v.getEngineHealth() < 70) {
+            if (engineHealth < 70) {
                 issues.add("Engine Wear");
                 status = "Critical";
                 action = "Immediate Service";
-            } else if (v.getEngineHealth() < 85) {
+            } else if (engineHealth < 85) {
                 issues.add("Minor Engine Check");
                 if (!status.equals("Critical")) {
                     status = "Due Soon";
@@ -48,11 +53,11 @@ public class MaintenanceController {
                 }
             }
 
-            if (v.getTireHealth() < 60) {
+            if (tireHealth < 60) {
                 issues.add("Tire Replacement");
                 status = "Critical";
                 action = "Replace Tires";
-            } else if (v.getTireHealth() < 80) {
+            } else if (tireHealth < 80) {
                 issues.add("Tire Rotation");
                 if (!status.equals("Critical")) {
                     status = "Due Soon";
@@ -60,7 +65,7 @@ public class MaintenanceController {
                 }
             }
 
-            if (v.getMileage() > 100000) {
+            if (mileage > 100000) {
                 issues.add("High Mileage Service");
                 if (!status.equals("Critical")) {
                     status = "Due Soon";

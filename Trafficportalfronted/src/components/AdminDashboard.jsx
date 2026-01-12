@@ -21,7 +21,7 @@ export default class AdminDashboard extends Component {
         this.toggleModal = this.toggleModal.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
         this.addVehicle = this.addVehicle.bind(this);
-        this.startSimulation = this.startSimulation.bind(this);
+
     }
 
     componentDidMount() {

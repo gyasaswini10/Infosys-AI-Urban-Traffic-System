@@ -24,7 +24,8 @@ public class SimulationService {
 
         for (Vehicle v : vehicles) {
             // Only simulate active vehicles (Status 1)
-            if (v.getStatus() == 1) {
+            // Use safe unboxing for status
+            if (v.getStatus() != null && v.getStatus() == 1) {
                 // 1. Simulate Speed
                 // Random speed between 20 and 100 km/h
                 int newSpeed = 20 + random.nextInt(81);
@@ -32,7 +33,10 @@ public class SimulationService {
 
                 // 2. Simulate Battery/Fuel Drain
                 // Drain 1% every cycle if speed > 0
-                double currentBattery = v.getBatteryLevel();
+                // Default to 100 if null to allow simulation to start, or 0 if preferred. Using
+                // 0 safe check.
+                double currentBattery = v.getBatteryLevel() != null ? v.getBatteryLevel() : 0.0;
+
                 if (currentBattery > 0) {
                     v.setBatteryLevel((int) (currentBattery - 1.0));
                 } else {
@@ -46,14 +50,18 @@ public class SimulationService {
                 // Dist = Speed (km/h) * Time (h)
                 // 5 sec = 5/3600 hours
                 double distanceCovered = (newSpeed * 5.0) / 3600.0;
-                v.setMileage(v.getMileage() + distanceCovered);
+                double currentMileage = v.getMileage() != null ? v.getMileage() : 0.0;
+                v.setMileage(currentMileage + distanceCovered);
 
                 // 4. Simulate Engine/Tire Wear (Slow degradation)
                 if (random.nextDouble() < 0.1) { // 10% chance to degrade per cycle
-                    if (v.getEngineHealth() > 0)
-                        v.setEngineHealth((int) (v.getEngineHealth() - 0.5));
-                    if (v.getTireHealth() > 0)
-                        v.setTireHealth((int) (v.getTireHealth() - 0.5));
+                    int engineHealth = v.getEngineHealth() != null ? v.getEngineHealth() : 100;
+                    if (engineHealth > 0)
+                        v.setEngineHealth((int) (engineHealth - 0.5));
+
+                    int tireHealth = v.getTireHealth() != null ? v.getTireHealth() : 100;
+                    if (tireHealth > 0)
+                        v.setTireHealth((int) (tireHealth - 0.5));
                 }
 
             } else {

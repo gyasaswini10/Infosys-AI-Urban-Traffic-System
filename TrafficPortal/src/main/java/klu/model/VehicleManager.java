@@ -19,18 +19,18 @@ public class VehicleManager {
             // Check for duplicates if needed, but regNo is unique
             if (V.getLocation() == null || V.getLocation().isEmpty())
                 V.setLocation("Garage"); // Default location
-            if (V.getSpeed() == 0)
+            if (V.getSpeed() == null || V.getSpeed() == 0)
                 V.setSpeed(0); // Default stationary
-            if (V.getBatteryLevel() == 0)
+            if (V.getBatteryLevel() == null || V.getBatteryLevel() == 0)
                 V.setBatteryLevel(100); // Default full charge
 
             // Randomize Health for Simulation
-            if (V.getEngineHealth() == 0)
+            if (V.getEngineHealth() == null || V.getEngineHealth() == 0)
                 V.setEngineHealth(80 + (int) (Math.random() * 20)); // 80-100%
-            if (V.getTireHealth() == 0)
+            if (V.getTireHealth() == null || V.getTireHealth() == 0)
                 V.setTireHealth(70 + (int) (Math.random() * 30)); // 70-100%
-            if (V.getMileage() == 0)
-                V.setMileage((int) (Math.random() * 50000));
+            if (V.getMileage() == null || V.getMileage() == 0)
+                V.setMileage(Math.random() * 50000);
             if (V.getLastServiceDate() == null)
                 V.setLastServiceDate("2024-01-01");
 

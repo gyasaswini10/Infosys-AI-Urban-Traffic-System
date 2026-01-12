@@ -25,25 +25,25 @@ public class Vehicle {
     String model;
 
     @Column(name = "status")
-    int status; // 1: Active, 2: Inactive
+    Integer status; // 1: Active, 2: Inactive
 
     @Column(name = "location")
     String location;
 
     @Column(name = "speed")
-    int speed;
+    Integer speed;
 
     @Column(name = "battery_level")
-    int batteryLevel;
+    Integer batteryLevel;
 
     @Column(name = "mileage")
-    double mileage;
+    Double mileage;
 
     @Column(name = "engine_health")
-    int engineHealth; // 0-100%
+    Integer engineHealth; // 0-100%
 
     @Column(name = "tire_health")
-    int tireHealth; // 0-100%
+    Integer tireHealth; // 0-100%
 
     @Column(name = "last_service")
     String lastServiceDate;
@@ -53,31 +53,28 @@ public class Vehicle {
     }
 
     // ...
-    public void setBatteryLevel(int batteryLevel) {
-        this.batteryLevel = batteryLevel;
-    }
 
-    public double getMileage() {
+    public Double getMileage() {
         return mileage;
     }
 
-    public void setMileage(double mileage) {
+    public void setMileage(Double mileage) {
         this.mileage = mileage;
     }
 
-    public int getEngineHealth() {
+    public Integer getEngineHealth() {
         return engineHealth;
     }
 
-    public void setEngineHealth(int engineHealth) {
+    public void setEngineHealth(Integer engineHealth) {
         this.engineHealth = engineHealth;
     }
 
-    public int getTireHealth() {
+    public Integer getTireHealth() {
         return tireHealth;
     }
 
-    public void setTireHealth(int tireHealth) {
+    public void setTireHealth(Integer tireHealth) {
         this.tireHealth = tireHealth;
     }
 
@@ -88,8 +85,6 @@ public class Vehicle {
     public void setLastServiceDate(String lastServiceDate) {
         this.lastServiceDate = lastServiceDate;
     }
-
-}
 
     public void setVehicleId(Long vehicleId) {
         this.vehicleId = vehicleId;
@@ -119,11 +114,11 @@ public class Vehicle {
         this.model = model;
     }
 
-    public int getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 
@@ -135,19 +130,19 @@ public class Vehicle {
         this.location = location;
     }
 
-    public int getSpeed() {
+    public Integer getSpeed() {
         return speed;
     }
 
-    public void setSpeed(int speed) {
+    public void setSpeed(Integer speed) {
         this.speed = speed;
     }
 
-    public int getBatteryLevel() {
+    public Integer getBatteryLevel() {
         return batteryLevel;
     }
 
-    public void setBatteryLevel(int batteryLevel) {
+    public void setBatteryLevel(Integer batteryLevel) {
         this.batteryLevel = batteryLevel;
     }
 

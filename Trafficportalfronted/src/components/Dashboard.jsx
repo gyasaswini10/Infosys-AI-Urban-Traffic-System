@@ -32,7 +32,7 @@ export default class Dashboard extends Component {
     if(sid === "")
       window.location.replace("/");
     
-    callApi("POST", "http://localhost:8080/users/getdetails", sid, (res)=> {
+    callApi("POST", "http://localhost:8080/users/getdetails", JSON.stringify({"csrid":sid}), (res)=> {
         let user = JSON.parse(res);
         this.setState({role: user.role});
         this.showFullname(user.fullname);
