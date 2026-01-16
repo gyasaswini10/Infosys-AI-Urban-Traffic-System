@@ -17,7 +17,8 @@ export default class AdminDashboard extends Component {
         this.state = {
             activeView: props.role === 3 ? 'my_routes' : 'city_overview', // Default view based on role
             isDriver: props.role === 3,
-            driverStats: null
+            driverStats: null,
+            users: []
         };
         this.handleMenuClick = this.handleMenuClick.bind(this);
     }
@@ -25,6 +26,54 @@ export default class AdminDashboard extends Component {
     componentDidMount() {
         if(this.state.isDriver && this.props.userid) {
             this.fetchDriverStats();
+        } else {
+            this.fetchUsers();
+        }
+    }
+
+    fetchUsers() {
+        // Fetch users for all relevant roles (1:Admin, 2:Manager, 3:Driver)
+        // Note: Simple implementation fetching individually. In prod, better to have /users/all
+        const roles = [1, 2, 3];
+        let allUsers = [];
+        let completed = 0;
+
+        roles.forEach(r => {
+            callApi("GET", BASEURL + "users/role/" + r, null, (data) => {
+                try {
+                    const roleUsers = JSON.parse(data);
+                    allUsers = [...allUsers, ...roleUsers];
+                } catch(e) { }
+                completed++;
+                if(completed === roles.length) {
+                    this.setState({ users: allUsers });
+                }
+            });
+        });
+    }
+
+    editUser(email) {
+        const statusStr = prompt("Update Status (0: Pending, 1: Active, 2: Rejected):", "1");
+        if(statusStr) {
+            const status = parseInt(statusStr);
+            const payload = { email: email, status: status };
+            
+            // Using direct fetch to ensure JSON.stringify is applied (handling potential api.js cache issues)
+            fetch(BASEURL + "users/updateStatus", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.text())
+            .then(resp => {
+                if(resp.includes("200")) {
+                     alert("✅ User status updated via Database!");
+                     this.fetchUsers(); 
+                } else {
+                     alert("❌ Update failed: " + resp);
+                }
+            })
+            .catch(err => alert("Error: " + err));
         }
     }
 
@@ -130,9 +179,21 @@ export default class AdminDashboard extends Component {
                                     <tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Action</th></tr>
                                 </thead>
                                 <tbody>
-                                    <tr><td>John CityAdmin</td><td>admin@gmail.com</td><td>Admin</td><td><span className="status-badge status-1">Active</span></td><td><button className="btn-secondary">Edit</button></td></tr>
-                                    <tr><td>Tech Manager</td><td>manager@gmail.com</td><td>Manager</td><td><span className="status-badge status-1">Active</span></td><td><button className="btn-secondary">Edit</button></td></tr>
-                                    <tr><td>Driver X</td><td>driver@gmail.com</td><td>Driver</td><td><span className="status-badge status-1">Active</span></td><td><button className="btn-secondary">Edit</button></td></tr>
+                                    {this.state.users.length > 0 ? this.state.users.map((u, i) => (
+                                        <tr key={i}>
+                                            <td>{u.fullname}</td>
+                                            <td>{u.email}</td>
+                                            <td>{u.role === 1 ? 'Admin' : u.role === 2 ? 'Manager' : 'Driver'}</td>
+                                            <td>
+                                                <span className={`status-badge status-${u.status}`}>
+                                                    {u.status === 1 ? 'Active' : u.status === 2 ? 'Rejected' : 'Pending'}
+                                                </span>
+                                            </td>
+                                            <td><button className="btn-secondary" onClick={() => this.editUser(u.email)}>Edit</button></td>
+                                        </tr>
+                                    )) : (
+                                        <tr><td colSpan="5">Loading Users...</td></tr>
+                                    )}
                                 </tbody>
                             </table>
                          </div>
