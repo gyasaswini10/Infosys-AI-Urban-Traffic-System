@@ -271,6 +271,7 @@ export default class AdminDashboard extends Component {
                             <button className={`btn-view ${viewMode==='grid'?'active':''}`} onClick={()=>this.setState({viewMode:'grid'})}>Grid</button>
                             <button className={`btn-view ${viewMode==='list'?'active':''}`} onClick={()=>this.setState({viewMode:'list'})}>List</button>
                             {(isAdmin || isDriver) && <button className="btn-add" onClick={this.toggleModal}>+ Register Vehicle</button>}
+                            <button className="btn-logout" onClick={() => {sessionStorage.clear(); window.location.href='/login';}} style={{background:'#6c757d', color:'white', border:'none', borderRadius:'4px', marginLeft:'10px'}}>Logout</button>
                         </div>
                     </div>
                     

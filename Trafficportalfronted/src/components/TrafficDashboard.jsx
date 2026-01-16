@@ -44,6 +44,8 @@ L.Icon.Default.mergeOptions({
 const TrafficDashboard = () => {
     const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0 });
     const [vehicles, setVehicles] = useState([]);
+    const [prediction, setPrediction] = useState(null);
+    const [publicTx, setPublicTx] = useState(null);
     const [hourlyData, setHourlyData] = useState({
         labels: ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00'],
         datasets: [
@@ -69,16 +71,26 @@ const TrafficDashboard = () => {
         setStats(mockStats);
         setLoading(false);
 
-        /* API DISABLED DUE TO 500 ERRORS
-        // Fetch Fleet Statistics
-        callApi("GET", BASEURL + "vehicle/stats", null, (data) => {
-             setStats(JSON.parse(data));
+        // Fetch Dynamic Predictions (New Backend)
+        callApi("GET", BASEURL + "traffic/predict", null, (data) => {
+            try { setPrediction(JSON.parse(data)); } catch(e) { console.error("Pred parse", e); }
+        });
+
+        // Fetch Public Transport Stats (New Backend)
+        callApi("GET", BASEURL + "traffic/public-transport", null, (data) => {
+            try { setPublicTx(JSON.parse(data)); } catch(e) { console.error("PT parse", e); }
         });
 
         // Fetch Fleet Locations for Heatmap
         callApi("GET", BASEURL + "vehicle/all", null, (data) => {
             setVehicles(JSON.parse(data));
-            setLoading(false);
+        });
+
+        /* API DISABLED DUE TO 500 ERRORS
+        // Fetch Fleet Statistics
+        callApi("GET", BASEURL + "vehicle/stats", null, (data) => {
+             setStats(JSON.parse(data));
+        });
         });
         */
     }, []);
@@ -186,6 +198,24 @@ const TrafficDashboard = () => {
                         },
                     }} data={hourlyData} />
                 </div>
+
+                {/* Smart City Predictions & Public Transport */}
+                {prediction && (
+                    <div className="card-panel" style={{background: 'linear-gradient(135deg, #6366f1, #4f46e5)', color:'white', padding:'20px', borderRadius:'10px', boxShadow:'0 2px 5px rgba(0,0,0,0.1)'}}>
+                        <h3>AI Traffic Prediction</h3>
+                        <p style={{fontSize:'1.2rem', marginBottom:'5px'}}>{prediction.congestionLevel} Congestion Tomorrow</p>
+                        <small>Peak Information: {prediction.tomorrowPeak}</small>
+                        <p style={{marginTop:'10px', fontSize:'0.9rem'}}>Affected: {prediction.affectedAreas && prediction.affectedAreas.join(", ")}</p>
+                    </div>
+                )}
+                {publicTx && (
+                     <div className="card-panel" style={{background: 'linear-gradient(135deg, #ec4899, #db2777)', color:'white', padding:'20px', borderRadius:'10px', boxShadow:'0 2px 5px rgba(0,0,0,0.1)'}}>
+                        <h3>Public Transport Pulse</h3>
+                        <p style={{fontSize:'1.2rem', marginBottom:'5px'}}>Active Fleet: {publicTx.activeFleet}</p>
+                        <small>Delays: {publicTx.metroDelays}</small>
+                        <p style={{marginTop:'10px', fontSize:'0.9rem'}}>Congestion: {publicTx.busCongestion}</p>
+                    </div>
+                )}
 
             </div>
         </div>

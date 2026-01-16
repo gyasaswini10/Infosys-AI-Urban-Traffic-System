@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import klu.repository.TrafficPostRepository;
 
+import klu.repository.TrafficPostRepository;
+
 @Service
 public class TrafficPostManager {
     @Autowired
@@ -28,9 +30,22 @@ public class TrafficPostManager {
     public String deleteTrafficPost(Long id) {
         try {
             TPR.deleteById(id);
-            return "200::Deleted Successfully";
+            return "200::Traffic Post Deleted Successfully";
         } catch (Exception e) {
-            return "500::Error Deleting: " + e.getMessage();
+            return "500::" + e.getMessage();
+        }
+    }
+
+    public String updateTrafficPostStatus(Long id, int status) {
+        try {
+            TrafficPost tp = TPR.findById(id).orElse(null);
+            if (tp == null)
+                return "404::Post Not Found";
+            tp.setStatus(status);
+            TPR.save(tp);
+            return "200::Status Updated";
+        } catch (Exception e) {
+            return "500::" + e.getMessage();
         }
     }
 

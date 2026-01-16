@@ -46,10 +46,15 @@ public class UsersManager {
 	}
 
 	public Users getUserDetails(String token) {
-		String email = JWT.validateToken(token);
-		if (email.compareTo("401") == 0)
+		try {
+			String email = JWT.validateToken(token);
+			if (email.compareTo("401") == 0)
+				return null;
+			return UR.findById(email).orElse(null);
+		} catch (Exception e) {
+			System.out.println(e);
 			return null;
-		return UR.findById(email).get();
+		}
 	}
 
 	public String updateUser(Users U) {
@@ -58,5 +63,16 @@ public class UsersManager {
 		existingUser.setPassword(U.getPassword());
 		UR.save(existingUser);
 		return "200::Profile Updated Successfully";
+	}
+
+	public java.util.List<Users> getUsersByRole(int role) {
+		return UR.findByRole(role);
+	}
+
+	public String updateUserStatus(String email, int status) {
+		Users U = UR.findById(email).get();
+		U.setStatus(status);
+		UR.save(U);
+		return "200::Status Updated";
 	}
 }

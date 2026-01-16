@@ -97,14 +97,38 @@
     cursor: pointer;
     font-weight: 600;
     box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-.vehicle-table {
+.btn-primary {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+    width: 100%;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+}
+
+/* Standard Table Styles for Reusability */
+.vehicle-table,
+.dashboard-table {
     width: 100%;
     border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.vehicle-table th {
+.vehicle-table th,
+.dashboard-table th {
     text-align: left;
     padding: 15px;
     background-color: #f6f9fc;
@@ -113,27 +137,81 @@
     border-bottom: 1px solid #e9ecef;
 }
 
-.vehicle-table td {
+.vehicle-table td,
+.dashboard-table td {
     padding: 15px;
     border-bottom: 1px solid #e9ecef;
     color: #525f7f;
+    vertical-align: middle;
 }
 
 .status-badge {
-    padding: 5px 10px;
+    padding: 5px 12px;
     border-radius: 20px;
     font-size: 0.8rem;
     font-weight: 600;
+    text-transform: capitalize;
 }
 
-.status-active {
+.status-active,
+.status-1 {
     background: #e6fffa;
     color: #00cc88;
 }
 
-.status-inactive {
+.status-inactive,
+.status-0 {
     background: #ffebee;
     color: #f5365c;
+}
+
+.status-pending,
+.status-3 {
+    background: #fff3cd;
+    color: #ffc107;
+}
+
+.status-rejected,
+.status-4,
+.status-2 {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Action Buttons */
+.action-btn-group {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-approve {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background 0.2s;
+}
+
+.btn-approve:hover {
+    background-color: #218838;
+}
+
+.btn-reject {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background 0.2s;
+}
+
+.btn-reject:hover {
+    background-color: #c82333;
 }
 
 /* Modal */

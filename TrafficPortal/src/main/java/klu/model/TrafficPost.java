@@ -31,6 +31,9 @@ public class TrafficPost {
     @Column(name = "description")
     String description;
 
+    @Column(name = "status", columnDefinition = "integer default 0")
+    Integer status = 0; // 0: Pending, 1: Verified, 2: Rejected
+
     public Long getId() {
         return id;
     }
@@ -77,6 +80,14 @@ public class TrafficPost {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
 }

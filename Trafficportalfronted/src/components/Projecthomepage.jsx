@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import '../css/Projecthomepage.css';
+import '../css/Auth.css'; // New styles
 import { BASEURL, callApi, setSession } from '../api';
 
 const Projecthomepage = () => {
@@ -29,7 +30,8 @@ const Projecthomepage = () => {
   };
 
   const closeModal = (e) => {
-    if (e.target.className === 'modal-overlay') {
+    // Check if clicked exactly on overlay OR if triggered manually
+    if ((e.target && e.target.className === 'modal-overlay') || e === 'close') {
       setShowModal(false);
     }
   };
@@ -203,10 +205,11 @@ const Projecthomepage = () => {
         </div>
       </footer>
 
-      {/* Modal Overlay */}
+      {/* Glassmorphism Modal Overlay */}
       {showModal && (
         <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-content">
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <span className="close-btn" onClick={() => closeModal('close')}>&times;</span>
             <div className="modal-header">
               <h2>{modalType === 'login' ? 'Welcome Back' : 'Create Account'}</h2>
             </div>
@@ -214,24 +217,29 @@ const Projecthomepage = () => {
             <div className="modal-body">
               {modalType === 'login' && (
                 <div className="form-group">
-                  <label>Email Address</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={loginData.email}
-                    onChange={handleLoginChange}
-                    placeholder="Enter your email"
-                  />
-                  <label>Password</label>
-                  <input
-                    type="password"
-                    name="password"
-                    value={loginData.password}
-                    onChange={handleLoginChange}
-                    placeholder="Enter your password"
-                  />
-                  <div className="forgot-password">
-                    <span onClick={handleForgotPassword}>Forgot Password?</span>
+                  <div className="input-wrapper">
+                      <label>Email Address</label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={loginData.email}
+                        onChange={handleLoginChange}
+                        placeholder="Enter your email"
+                        autoFocus
+                      />
+                  </div>
+                  <div className="input-wrapper">
+                      <label>Password</label>
+                      <input
+                        type="password"
+                        name="password"
+                        value={loginData.password}
+                        onChange={handleLoginChange}
+                        placeholder="Enter your password"
+                      />
+                  </div>
+                  <div className="forgot-password" style={{textAlign:'right', fontSize:'0.85rem'}}>
+                    <span onClick={handleForgotPassword} style={{color:'#007bff', cursor:'pointer'}}>Forgot Password?</span>
                   </div>
                   <button className="submit-btn" onClick={handleLoginSubmit}>Sign In</button>
                   <div className="switch-mode">
@@ -242,46 +250,56 @@ const Projecthomepage = () => {
 
               {modalType === 'signup' && (
                 <div className="form-group">
-                  <label>Full Name</label>
-                  <input
-                    type="text"
-                    name="fullname"
-                    value={signupData.fullname}
-                    onChange={handleSignupChange}
-                    placeholder="Full Name"
-                  />
-                  <label>Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={signupData.email}
-                    onChange={handleSignupChange}
-                    placeholder="Email Address"
-                  />
-                  <label>Role</label>
-                  <select name="role" value={signupData.role} onChange={handleSignupChange}>
-                    <option value="">Select Role</option>
-                    <option value="1">Admin</option>
-                    <option value="2">Manager</option>
-                    <option value="3">Driver</option>
-                    <option value="4">Customer</option>
-                  </select>
-                  <label>Password</label>
-                  <input
-                    type="password"
-                    name="password"
-                    value={signupData.password}
-                    onChange={handleSignupChange}
-                    placeholder="Create Password"
-                  />
-                  <label>Confirm Password</label>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    value={signupData.confirmPassword}
-                    onChange={handleSignupChange}
-                    placeholder="Confirm Password"
-                  />
+                  <div className="input-wrapper">
+                      <label>Full Name</label>
+                      <input
+                        type="text"
+                        name="fullname"
+                        value={signupData.fullname}
+                        onChange={handleSignupChange}
+                        placeholder="John Doe"
+                      />
+                   </div>
+                   <div className="input-wrapper">
+                      <label>Email</label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={signupData.email}
+                        onChange={handleSignupChange}
+                        placeholder="email@example.com"
+                      />
+                   </div>
+                   <div className="input-wrapper">
+                      <label>Role</label>
+                      <select name="role" value={signupData.role} onChange={handleSignupChange}>
+                        <option value="">Select Role</option>
+                        <option value="1">Admin</option>
+                        <option value="2">Manager</option>
+                        <option value="3">Driver</option>
+                        <option value="4">Customer</option>
+                      </select>
+                   </div>
+                   <div className="input-wrapper">
+                      <label>Password</label>
+                      <input
+                        type="password"
+                        name="password"
+                        value={signupData.password}
+                        onChange={handleSignupChange}
+                        placeholder="Create Password"
+                      />
+                   </div>
+                   <div className="input-wrapper">
+                      <label>Confirm Password</label>
+                      <input
+                        type="password"
+                        name="confirmPassword"
+                        value={signupData.confirmPassword}
+                        onChange={handleSignupChange}
+                        placeholder="Confirm Password"
+                      />
+                   </div>
                   <button className="submit-btn" onClick={handleSignupSubmit}>Register</button>
                   <div className="switch-mode">
                     Already have an account? <span onClick={() => setModalType('login')}>Sign In</span>

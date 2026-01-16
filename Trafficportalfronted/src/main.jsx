@@ -9,10 +9,12 @@ import Dashboard from './components/Dashboard.jsx'
 
 //index.css
 createRoot(document.getElementById('root')).render(
+
     <BrowserRouter>
    <Routes>
     <Route path='/' element={<Projecthomepage/>}></Route>
     <Route path='/dashboard' element={<Dashboard/>}></Route>
    </Routes>
     </BrowserRouter>
+    
 )

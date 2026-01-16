@@ -7,7 +7,7 @@ import jakarta.persistence.Table;
 
 @Entity
 
-@Table(name="users")
+@Table(name = "users")
 
 public class Users {
 
@@ -24,6 +24,9 @@ public class Users {
   @Column
 
   int role;
+
+  @Column(columnDefinition = "integer default 0")
+  Integer status = 0; // 0: Pending, 1: Active, 2: Rejected
 
   @Column
 
@@ -65,6 +68,14 @@ public class Users {
 
   }
 
+  public Integer getStatus() {
+    return status;
+  }
+
+  public void setStatus(Integer status) {
+    this.status = status;
+  }
+
   public String getPassword() {
 
     return password;
@@ -84,13 +95,5 @@ public class Users {
     return "Users [Fullname=" + Fullname + ", email=" + email + ", role=" + role + ", password=" + password + "]";
 
   }
-
-  
-
-  
-
-  
-
-
 
 }

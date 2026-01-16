@@ -11,11 +11,13 @@ import klu.model.Users;
 @Repository
 public interface UsersRepository extends JpaRepository<Users, String> {
 
-  
   @Query("select count(U) from Users U where U.email =:email")
   public int validateEmail(@Param("email") String email);
-  
+
   @Query("select count(U) from Users U where U.email=:email and U.password=:password")
   public int validateCresentials(@Param("email") String email, @Param("password") String password);
+
+  @Query("select U from Users U where U.role = :role")
+  public java.util.List<Users> findByRole(@Param("role") int role);
 
 }

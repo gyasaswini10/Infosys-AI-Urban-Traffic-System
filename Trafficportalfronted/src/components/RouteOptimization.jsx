@@ -109,6 +109,7 @@ export default class RouteOptimization extends Component {
                                         <span className="traffic-badge">{route.trafficCondition} Traffic</span>
                                     </div>
                                     <div className="eta-time">{route.eta} <span style={{fontSize:'0.8rem', fontWeight:'normal'}}>({route.distance})</span></div>
+                                    {route.co2 && <div style={{fontSize:'0.8rem', color:'#6b7280', marginTop:'5px'}}>🌱 CO2 Impact: {route.co2}</div>}
                                 </div>
                             ))}
                         </div>

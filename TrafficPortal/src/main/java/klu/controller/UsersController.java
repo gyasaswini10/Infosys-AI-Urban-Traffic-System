@@ -53,4 +53,16 @@ public class UsersController {
 		return um.updateUser(U);
 	}
 
+	@GetMapping("/role/{roleId}")
+	public java.util.List<Users> getUsersByRole(@PathVariable("roleId") int roleId) {
+		return um.getUsersByRole(roleId);
+	}
+
+	@PostMapping("/updateStatus")
+	public String updateUserStatus(@RequestBody Map<String, Object> payload) {
+		String email = (String) payload.get("email");
+		int status = Integer.parseInt(payload.get("status").toString());
+		return um.updateUserStatus(email, status);
+	}
+
 }
