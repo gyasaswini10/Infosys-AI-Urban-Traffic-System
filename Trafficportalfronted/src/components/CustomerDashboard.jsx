@@ -93,6 +93,59 @@ export default class CustomerDashboard extends Component {
                          </div>
                     </div>
                 );
+            case 'traffic_search':
+                return <TrafficSearch />;
+            case 'travel_predictor':
+                return (
+                    <div className="tab-content">
+                        <h3>⏳ Travel Time Predictor</h3>
+                        <div className="card-panel">
+                             <h4>Predict Tomorrow's Traffic</h4>
+                             <div style={{display:'flex', gap:'10px', margin:'15px 0'}}>
+                                 <input type="text" placeholder="Source Point" className="input-field" style={{padding:'10px', flex:1}} />
+                                 <input type="text" placeholder="Destination" className="input-field" style={{padding:'10px', flex:1}} />
+                                 <button className="btn-primary" onClick={() => alert("Predictions Loaded")}>Analyze</button>
+                             </div>
+                             <div className="prediction-results" style={{marginTop:'20px'}}>
+                                 <div className="alert-card info">
+                                     <h4>⚠️ Peak Hour Warning</h4>
+                                     <p>Expect high congestion on this route between <strong>08:30 AM - 10:30 AM</strong> tomorrow.</p>
+                                 </div>
+                                 <div style={{height:'200px', background:'#eef2f7', display:'flex', alignItems:'center', justifyContent:'center', borderRadius:'8px', marginTop:'10px'}}>
+                                     📉 [Graph: Hourly Traffic Trend Forecast]
+                                 </div>
+                             </div>
+                        </div>
+                    </div>
+                );
+            case 'public_transport':
+                 return (
+                    <div className="tab-content">
+                        <h3>🚇 Public Transport Status</h3>
+                        <div className="transport-grid" style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'20px'}}>
+                            <div className="card-panel">
+                                <h4>Metro Delays</h4>
+                                <ul className="alert-list">
+                                    <li className="alert-item ok">✅ Red Line: On Time</li>
+                                    <li className="alert-item warning">⚠️ Blue Line: 5 min delay (Technical Issue)</li>
+                                    <li className="alert-item ok">✅ Green Line: On Time</li>
+                                </ul>
+                            </div>
+                            <div className="card-panel">
+                                <h4>Bus Services</h4>
+                                 <ul className="alert-list">
+                                    <li className="alert-item warning">⚠️ Route 47C: Diverted via Road 12</li>
+                                    <li className="alert-item ok">✅ Route 10H: Operating Normal</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div className="card-panel" style={{marginTop:'20px'}}>
+                            <h4>Multimodal Planner</h4>
+                             <p>Combine Metro + Last Mile Auto/Cab for fastest reach.</p>
+                             <button className="btn-secondary">Plan Multimodal Trip</button>
+                        </div>
+                    </div>
+                 );
             case 'post_report':
                 return <TrafficPosting />;
             case 'travel_history':

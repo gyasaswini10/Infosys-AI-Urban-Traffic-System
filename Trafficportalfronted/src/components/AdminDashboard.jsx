@@ -120,6 +120,23 @@ export default class AdminDashboard extends Component {
                     return <TrafficSearch />;
                 case 'post_alert':
                     return <TrafficPosting />;
+                case 'user_management':
+                    return (
+                         <div className="tab-content">
+                            <h3>👥 User & Role Management</h3>
+                            <p>Manage access for Admins, Managers, and Drivers.</p>
+                             <table className="dashboard-table">
+                                <thead>
+                                    <tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Action</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>John CityAdmin</td><td>admin@gmail.com</td><td>Admin</td><td><span className="status-badge status-1">Active</span></td><td><button className="btn-secondary">Edit</button></td></tr>
+                                    <tr><td>Tech Manager</td><td>manager@gmail.com</td><td>Manager</td><td><span className="status-badge status-1">Active</span></td><td><button className="btn-secondary">Edit</button></td></tr>
+                                    <tr><td>Driver X</td><td>driver@gmail.com</td><td>Driver</td><td><span className="status-badge status-1">Active</span></td><td><button className="btn-secondary">Edit</button></td></tr>
+                                </tbody>
+                            </table>
+                         </div>
+                    );
                 case 'profile':
                     return <Profile />;
                 default:
@@ -130,6 +147,21 @@ export default class AdminDashboard extends Component {
         // --- DRIVER VIEWS ---
         else {
             switch (activeView) {
+                // ... (existing cases)
+                case 'ev_charging':
+                     return (
+                        <div className="tab-content">
+                            <h3>⚡ EV Charging Guidance</h3>
+                            <div className="card-panel">
+                                <h4>Nearby Stations</h4>
+                                <ul className="alert-list">
+                                    <li className="alert-item ok">🔋 <strong>Station A (2km)</strong>: 4 Fast Chargers (Available)</li>
+                                    <li className="alert-item warning">🔋 <strong>Station B (5km)</strong>: 2 Chargers (Wait time: 10m)</li>
+                                </ul>
+                                <button className="btn-primary" style={{marginTop:'15px'}}>Navigate to Nearest Charger</button>
+                            </div>
+                        </div>
+                     );
                 case 'my_routes':
                     return (
                         <div className="tab-content">
@@ -142,8 +174,9 @@ export default class AdminDashboard extends Component {
                                     </div>
                                     <h4>Logistics Hub A &rarr; City Center Zone 4</h4>
                                     <p>Cargo: Medical Supplies</p>
+                                    <p>Cargo: Medical Supplies</p>
                                     <div className="progress-bar"><div style={{width:'40%'}}></div></div>
-                                    <button className="btn-primary" style={{width:'100%', marginTop:'10px'}}>Start Navigation</button>
+                                    <button className="btn-primary" style={{width:'100%', marginTop:'10px'}} onClick={() => this.setState({activeView: 'navigation'})}>Start Navigation</button>
                                 </div>
                                 <div className="route-card">
                                     <div className="route-header">
@@ -152,7 +185,7 @@ export default class AdminDashboard extends Component {
                                     </div>
                                     <h4>City Center &rarr; Warehouse B</h4>
                                     <p>Cargo: General Goods</p>
-                                    <button className="btn-secondary" style={{width:'100%', marginTop:'10px'}}>View Details</button>
+                                    <button className="btn-secondary" style={{width:'100%', marginTop:'10px'}} onClick={() => alert("Route Details\n\nFrom: City Center\nTo: Warehouse B\nCargo: General Goods\nPickup Time: 14:00\n\nStatus: Scheduled")}>View Details</button>
                                 </div>
                             </div>
                         </div>

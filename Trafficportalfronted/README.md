@@ -163,3 +163,25 @@ Customer here means **city user who views traffic, plans travel, and gives traff
 This version matches your title:
 **“NeuroFleetX – AI-Driven Urban Mobility Optimization System”**
 Not just booking — full traffic + fleet + smart city platform.
+
+---
+
+## ⚙️ Setup & Installation
+
+### 1. Backend (Spring Boot)
+1.  Navigate to `TrafficPortal` folder.
+2.  Update `application.properties` with your MySQL credentials.
+3.  Run the application as a Spring Boot App.
+4.  Server starts at `http://localhost:8080`.
+
+### 2. Frontend (React)
+1.  Navigate to `Trafficportalfronted` folder.
+2.  Run `npm install` to install dependencies.
+3.  Run `npm run dev` to start the development server.
+4.  Open `http://localhost:5173` in your browser.
+
+### 3. Login Credentials (Demo)
+*   **Admin**: `admin@gmail.com` / `admin`
+*   **Manager**: `manager@gmail.com` / `manager`
+*   **Driver**: `driver@gmail.com` / `driver`
+*   **Customer**: `customer@gmail.com` / `customer`

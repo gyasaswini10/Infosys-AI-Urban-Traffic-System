@@ -5,7 +5,8 @@ export const ADMIN_MENU = [
     { mid: 4, menu: "Maintenance", icon: "/images/maintenance.png", view: "maintenance" },
     { mid: 5, menu: "Incident Search", icon: "/images/search.png", view: "incident_search" },
     { mid: 6, menu: "Post Alert", icon: "/images/alert.png", view: "post_alert" },
-    { mid: 7, menu: "Profile", icon: "/images/profile.png", view: "profile" }
+    { mid: 7, menu: "User Management", icon: "/images/users.png", view: "user_management" },
+    { mid: 8, menu: "Profile", icon: "/images/profile.png", view: "profile" }
 ];
 
 export const MANAGER_MENU = [
@@ -24,15 +25,19 @@ export const DRIVER_MENU = [
     { mid: 3, menu: "Report Issue", icon: "/images/report_issue.png", view: "report_issue" },
     { mid: 4, menu: "Vehicle Health", icon: "/images/health.png", view: "vehicle_health" },
     { mid: 5, menu: "Incentives", icon: "/images/incentive.png", view: "incentives" },
-    { mid: 6, menu: "Profile", icon: "/images/profile.png", view: "profile" }
+    { mid: 6, menu: "EV Charging", icon: "/images/charging.png", view: "ev_charging" },
+    { mid: 7, menu: "Profile", icon: "/images/profile.png", view: "profile" }
 ];
 
 export const CUSTOMER_MENU = [
     { mid: 1, menu: "Live Traffic", icon: "/images/traffic.png", view: "live_traffic" },
     { mid: 2, menu: "Route Planner", icon: "/images/route.png", view: "route_planner" },
     { mid: 3, menu: "Traffic Alerts", icon: "/images/alert.png", view: "traffic_alerts" },
-    { mid: 4, menu: "Post Report", icon: "/images/report.png", view: "post_report" },
-    { mid: 5, menu: "Travel History", icon: "/images/history.png", view: "travel_history" },
-    { mid: 6, menu: "Eco Routes", icon: "/images/eco.png", view: "eco_routes" },
-    { mid: 7, menu: "Profile", icon: "/images/profile.png", view: "profile" }
+    { mid: 4, menu: "Traffic Search", icon: "/images/search.png", view: "traffic_search" },
+    { mid: 5, menu: "Post Report", icon: "/images/report.png", view: "post_report" },
+    { mid: 6, menu: "Travel Predictor", icon: "/images/clock.png", view: "travel_predictor" },
+    { mid: 7, menu: "Public Transport", icon: "/images/bus.png", view: "public_transport" },
+    { mid: 8, menu: "Travel History", icon: "/images/history.png", view: "travel_history" },
+    { mid: 9, menu: "Eco Routes", icon: "/images/eco.png", view: "eco_routes" },
+    { mid: 10, menu: "Profile", icon: "/images/profile.png", view: "profile" }
 ];
