@@ -20,8 +20,8 @@ import { MapContainer, TileLayer, Popup, Circle, LayerGroup } from 'react-leafle
 import L from 'leaflet';
 
 // PDF Export
-import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 // Register ChartJS
 ChartJS.register(
@@ -118,7 +118,12 @@ const TrafficDashboard = () => {
             tableRows.push(vehicleData);
         });
 
-        doc.autoTable(tableColumn, tableRows, { startY: 40 });
+        autoTable(doc, {
+            head: [tableColumn],
+            body: tableRows,
+            startY: 40
+        });
+        
         doc.save("mobility_report.pdf");
     };
 

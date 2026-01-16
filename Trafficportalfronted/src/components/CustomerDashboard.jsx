@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { BASEURL, callApi } from '../api';
 import '../css/AdminDashboard.css';
+import Header from './Header';
 import MenuBar from './MenuBar';
 import { CUSTOMER_MENU } from './MenuConstants';
 import TrafficDashboard from './TrafficDashboard';
@@ -54,13 +55,42 @@ export default class CustomerDashboard extends Component {
                 return <RouteOptimization />;
             case 'traffic_alerts':
                 return (
-                    <div className="placeholder-view">
-                         <h2>My Traffic Alerts</h2>
-                         <p>Subscribed Areas: <strong>Hitech City, Jubilee Hills</strong></p>
-                         <ul className="alert-list">
-                             <li className="alert-item">🚧 Construction on Road No 45 (Delay 10m)</li>
-                             <li className="alert-item">🌧️ Heavy Rain Warning: Avoid Low lying areas</li>
-                         </ul>
+                    <div className="tab-content">
+                         <h3>🔔 My Traffic Alerts</h3>
+                         
+                         <div className="alert-card critical">
+                            <div className="alert-header">
+                                <span className="icon">🌧️</span>
+                                <h4>Heavy Rain Warning</h4>
+                                <span className="time">10 mins ago</span>
+                            </div>
+                            <p>Severe waterlogging reported in <strong>Hitech City, Madhapur</strong>. Avoid low-lying areas. Expect delays of 45+ mins.</p>
+                         </div>
+
+                         <div className="alert-card warning">
+                            <div className="alert-header">
+                                <span className="icon">🚧</span>
+                                <h4>Road Construction</h4>
+                                <span className="time">1 hour ago</span>
+                            </div>
+                            <p><strong>Road No 45 Jubilee Hills</strong> is partially closed for Metro work. Use alternative route via KBR Park.</p>
+                         </div>
+
+                         <div className="alert-card info">
+                            <div className="alert-header">
+                                <span className="icon">📢</span>
+                                <h4>Rally Notification</h4>
+                                <span className="time">Yesterday</span>
+                            </div>
+                            <p>Political rally expected near <strong>Necklace Road</strong> tomorrow 10 AM - 2 PM. Plan travel accordingly.</p>
+                         </div>
+
+                         <div className="subscription-box">
+                             <h4>Manage Subscriptions</h4>
+                             <label><input type="checkbox" checked readOnly/> Peak Hour Alerts</label>
+                             <label><input type="checkbox" checked readOnly/> Accident Reports</label>
+                             <label><input type="checkbox" /> Air Quality Warnings</label>
+                         </div>
                     </div>
                 );
             case 'post_report':
@@ -99,11 +129,17 @@ export default class CustomerDashboard extends Component {
     }
 
     render() {
+        const { userid } = this.props;
         return (
-            <div className="dashboard-container">
-                <MenuBar manualMenus={CUSTOMER_MENU} onMenuClick={this.handleMenuClick} />
-                <div className="dashboard-content">
-                    {this.renderContent()}
+            <div className="dashboard-layout" style={{display:'flex', height:'100vh', overflow:'hidden'}}>
+                <div className="sidebar-container" style={{width:'260px', flexShrink:0, borderRight:'1px solid #ddd'}}>
+                    <MenuBar manualMenus={CUSTOMER_MENU} onMenuClick={this.handleMenuClick} />
+                </div>
+                <div className="main-content" style={{flexGrow:1, display:'flex', flexDirection:'column', overflow:'hidden'}}>
+                    <Header title="Citizen Portal" user={userid} />
+                    <div className="content-scrollable" style={{flexGrow:1, overflowY:'auto', padding:'25px', background:'#f8f9fa'}}>
+                        {this.renderContent()}
+                    </div>
                 </div>
             </div>
         );

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { BASEURL, callApi } from '../api';
 import '../css/AdminDashboard.css';
+import Header from './Header';
 import MenuBar from './MenuBar';
 import { MANAGER_MENU } from './MenuConstants';
 import RouteOptimization from './RouteOptimization';
@@ -130,11 +131,39 @@ export default class FleetManagerDashboard extends Component {
                 return <TrafficDashboard />;
             case 'reports':
                 return (
-                    <div className="placeholder-view">
-                        <h2>Fleet Analytics Reports</h2>
+                    <div className="tab-content">
+                        <h3>📋 Fleet Analytics Reports</h3>
                         <div className="stats-container">
-                             <div className="stat-card"><h3>Fuel Costs</h3><p>$4,200</p></div>
-                             <div className="stat-card"><h3>Avg Delay</h3><p>12 mins</p></div>
+                             <div className="stat-card" style={{borderLeft:'5px solid #10b981'}}>
+                                 <h3>Total Fuel Savings (EV)</h3>
+                                 <h1>$12,450</h1>
+                                 <p>Vs Diesel Fleet</p>
+                             </div>
+                             <div className="stat-card" style={{borderLeft:'5px solid #3b82f6'}}>
+                                 <h3>Average Trip Time</h3>
+                                 <h1>42 mins</h1>
+                                 <p>Improved by 8%</p>
+                             </div>
+                             <div className="stat-card" style={{borderLeft:'5px solid #ef4444'}}>
+                                 <h3>Maintenance Costs</h3>
+                                 <h1>$3,200</h1>
+                                 <p>This Quarter</p>
+                             </div>
+                        </div>
+                        
+                        <div className="card-panel" style={{marginTop:'20px'}}>
+                            <h4>Monthly Performance Breakdown</h4>
+                            <table className="dashboard-table">
+                                <thead>
+                                    <tr><th>Metric</th><th>Target</th><th>Actual</th><th>Status</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>On-Time Deliveries</td><td>98%</td><td>96.5%</td><td><span className="status-badge status-2">At Risk</span></td></tr>
+                                    <tr><td>Vehicle Utilization</td><td>85%</td><td>92%</td><td><span className="status-badge status-1">Excellent</span></td></tr>
+                                    <tr><td>Avg Privacy Score</td><td>95</td><td>98</td><td><span className="status-badge status-1">Good</span></td></tr>
+                                    <tr><td>CO2 Emission</td><td>&lt; 500kg</td><td>450kg</td><td><span className="status-badge status-1">Good</span></td></tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 );
@@ -146,11 +175,17 @@ export default class FleetManagerDashboard extends Component {
     }
 
     render() {
+        const { userid } = this.props;
         return (
-            <div className="dashboard-container">
-                <MenuBar manualMenus={MANAGER_MENU} onMenuClick={this.handleMenuClick} />
-                <div className="dashboard-content">
-                    {this.renderContent()}
+            <div className="dashboard-layout" style={{display:'flex', height:'100vh', overflow:'hidden'}}>
+                <div className="sidebar-container" style={{width:'260px', flexShrink:0, borderRight:'1px solid #ddd'}}>
+                    <MenuBar manualMenus={MANAGER_MENU} onMenuClick={this.handleMenuClick} />
+                </div>
+                <div className="main-content" style={{flexGrow:1, display:'flex', flexDirection:'column', overflow:'hidden'}}>
+                    <Header title="Fleet Manager Command" user={userid} />
+                    <div className="content-scrollable" style={{flexGrow:1, overflowY:'auto', padding:'25px', background:'#f8f9fa'}}>
+                        {this.renderContent()}
+                    </div>
                 </div>
             </div>
         );

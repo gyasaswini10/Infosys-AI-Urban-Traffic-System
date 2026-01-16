@@ -5,6 +5,8 @@ import Register from './components/Register';
 import AdminDashboard from './components/AdminDashboard';
 import FleetManagerDashboard from './components/FleetManagerDashboard';
 import CustomerDashboard from './components/CustomerDashboard';
+import Projecthomepage from './components/Projecthomepage';
+import Dashboard from './components/Dashboard';
 import './App.css';
 
 // Protected Route Wrapper
@@ -29,10 +31,13 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<Projecthomepage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         
+        {/* Dispatcher Route */}
+        <Route path="/dashboard" element={<Dashboard />} />
+
         {/* Admin Route (Role 1) */}
         <Route path="/admin" element={
           <ProtectedRoute allowedRoles={[1]}>
