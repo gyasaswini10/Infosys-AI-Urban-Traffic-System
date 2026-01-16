@@ -1,19 +1,23 @@
 import React, { Component } from 'react';
 import { BASEURL, callApi } from '../api';
-import '../css/AdminDashboard.css'; // Re-use Admin styles
+import '../css/AdminDashboard.css';
+import MenuBar from './MenuBar';
+import { MANAGER_MENU } from './MenuConstants';
+import RouteOptimization from './RouteOptimization';
+import Maintenance from './Maintenance';
+import TrafficDashboard from './TrafficDashboard';
+import Profile from './Profile';
 
 export default class FleetManagerDashboard extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            activeTab: 'vehicles',
-            vehicles: [],
-            drivers: [],
-            activeTab: 'vehicles',
+            activeView: 'fleet_dashboard',
             vehicles: [],
             drivers: [],
             incidents: []
         };
+        this.handleMenuClick = this.handleMenuClick.bind(this);
     }
 
     componentDidMount() {
@@ -23,19 +27,25 @@ export default class FleetManagerDashboard extends Component {
     fetchData() {
         // Fetch Vehicles
         callApi("GET", BASEURL + "vehicle/all", null, (data) => {
-            try { this.setState({ vehicles: JSON.parse(data) }); } catch(e) { console.error("Vehicles parse error", e); this.setState({vehicles: []}); }
+            try { this.setState({ vehicles: JSON.parse(data) }); } catch(e) { this.setState({vehicles: []}); }
         });
 
         // Fetch Drivers
         callApi("GET", BASEURL + "users/role/3", null, (data) => {
-             try { this.setState({ drivers: JSON.parse(data) }); } catch(e) { console.error("Drivers parse error", e); this.setState({drivers: []}); }
+             try { this.setState({ drivers: JSON.parse(data) }); } catch(e) { this.setState({drivers: []}); }
         });
-
 
         // Fetch Traffic Incidents
         callApi("GET", BASEURL + "traffic/read", null, (data) => {
-            try { this.setState({ incidents: JSON.parse(data) }); } catch(e) { console.error("Incidents parse error", e); this.setState({incidents: []}); }
+            try { this.setState({ incidents: JSON.parse(data) }); } catch(e) { this.setState({incidents: []}); }
         });
+    }
+
+    handleMenuClick(menuId) {
+        const selected = MANAGER_MENU.find(m => m.mid === menuId);
+        if (selected) {
+            this.setState({ activeView: selected.view });
+        }
     }
 
     updateVehicleStatus(id, status) {
@@ -52,59 +62,24 @@ export default class FleetManagerDashboard extends Component {
         });
     }
 
-    updateIncidentStatus(id, status) {
-        callApi("POST", BASEURL + "traffic/updateStatus", JSON.stringify({ id: id, status: status }), () => {
-            alert("Incident Status Updated");
-            this.fetchData();
-        });
-    }
+    renderContent() {
+        const { activeView, vehicles, drivers, incidents } = this.state;
+        const { userid, role } = this.props;
 
-    render() {
-        const { activeTab, vehicles, drivers, incidents } = this.state;
-
-        return (
-            <div className="dashboard-container" style={{padding:'20px'}}>
-                <h1>Traffic Manager Dashboard</h1>
-                <div className="tabs" style={{marginBottom:'20px', borderBottom:'1px solid #ccc'}}>
-                    <button className={activeTab === 'incidents' ? 'active-tab' : ''} onClick={() => this.setState({ activeTab: 'incidents' })} style={{padding:'10px 20px', marginRight:'10px', background: activeTab==='incidents'?'#007bff':'#f0f0f0', color:activeTab==='incidents'?'white':'black', border:'none'}}>Traffic Incidents</button>
-                    <button className={activeTab === 'vehicles' ? 'active-tab' : ''} onClick={() => this.setState({ activeTab: 'vehicles' })} style={{padding:'10px 20px', marginRight:'10px', background: activeTab==='vehicles'?'#007bff':'#f0f0f0', color:activeTab==='vehicles'?'white':'black', border:'none'}}>Vehicles</button>
-                    <button className={activeTab === 'drivers' ? 'active-tab' : ''} onClick={() => this.setState({ activeTab: 'drivers' })} style={{padding:'10px 20px', marginRight:'10px', background: activeTab==='drivers'?'#007bff':'#f0f0f0', color:activeTab==='drivers'?'white':'black', border:'none'}}>Drivers</button>
-                </div>
-
-                {activeTab === 'incidents' && (
+        switch (activeView) {
+            case 'fleet_dashboard':
+                return (
                     <div className="tab-content">
-                        <h3>Incident Verification</h3>
-                         <table className="dashboard-table">
-                            <thead>
-                                <tr><th>Title</th><th>Location</th><th>Type</th><th>Severity</th><th>Status</th><th>Actions</th></tr>
-                            </thead>
-                            <tbody>
-                                {Array.isArray(incidents) && incidents.map(i => (
-                                    <tr key={i.id}>
-                                        <td>{i.title}</td><td>{i.location}</td><td>{i.type}</td>
-                                        <td><span className={`status-badge ${i.severity === 'High' ? 'status-rejected' : 'status-pending'}`}>{i.severity}</span></td>
-                                        <td><span className={`status-badge status-${i.status ? i.status : 0}`}>{i.status === 1 ? 'Verified' : i.status === 2 ? 'Rejected' : 'Pending'}</span></td>
-                                        <td>
-                                            <div className="action-btn-group">
-                                                {i.status !== 1 && <button onClick={() => this.updateIncidentStatus(i.id, 1)} className="btn-approve">Verify</button>}
-                                                {i.status !== 2 && <button onClick={() => this.updateIncidentStatus(i.id, 2)} className="btn-reject">Reject</button>}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
-
-                {activeTab === 'vehicles' && (
-                    <div className="tab-content">
-                        <h3>Vehicle Approvals</h3>
+                        <h3>Active Fleet Status</h3>
+                        <p>{Array.isArray(vehicles) ? vehicles.filter(v => v.status === 1).length : 0} vehicles currently active.</p>
+                        
+                        <h4>Vehicle Approval Queue</h4>
                          <table className="dashboard-table">
                             <thead>
                                 <tr><th>ID</th><th>Reg No</th><th>Model</th><th>Status</th><th>Actions</th></tr>
                             </thead>
                             <tbody>
+                                {Array.isArray(vehicles) && vehicles.filter(v => v.status === 3).length === 0 && <tr><td colSpan="5">No pending vehicles</td></tr>}
                                 {Array.isArray(vehicles) && vehicles.filter(v => v.status === 3).map(v => (
                                     <tr key={v.vehicleId}>
                                         <td>{v.vehicleId}</td><td>{v.regNo}</td><td>{v.model}</td>
@@ -119,14 +94,14 @@ export default class FleetManagerDashboard extends Component {
                                 ))}
                             </tbody>
                         </table>
-                        <h3>Active Vehicles</h3>
-                        <p>{Array.isArray(vehicles) ? vehicles.filter(v => v.status === 1).length : 0} vehicles active.</p>
                     </div>
-                )}
-
-                {activeTab === 'drivers' && (
+                );
+            case 'ai_routes':
+                return <RouteOptimization />;
+            case 'drivers':
+                return (
                     <div className="tab-content">
-                        <h3>Drivers List</h3>
+                        <h3>Driver Management</h3>
                          <table className="dashboard-table">
                             <thead>
                                 <tr><th>Name</th><th>Email</th><th>Status</th><th>Actions</th></tr>
@@ -148,8 +123,35 @@ export default class FleetManagerDashboard extends Component {
                             </tbody>
                         </table>
                     </div>
-                )}
+                );
+            case 'maintenance':
+                return <Maintenance role={role} userid={userid} />;
+            case 'traffic_view':
+                return <TrafficDashboard />;
+            case 'reports':
+                return (
+                    <div className="placeholder-view">
+                        <h2>Fleet Analytics Reports</h2>
+                        <div className="stats-container">
+                             <div className="stat-card"><h3>Fuel Costs</h3><p>$4,200</p></div>
+                             <div className="stat-card"><h3>Avg Delay</h3><p>12 mins</p></div>
+                        </div>
+                    </div>
+                );
+            case 'profile':
+                return <Profile />;
+            default:
+                return null;
+        }
+    }
 
+    render() {
+        return (
+            <div className="dashboard-container">
+                <MenuBar manualMenus={MANAGER_MENU} onMenuClick={this.handleMenuClick} />
+                <div className="dashboard-content">
+                    {this.renderContent()}
+                </div>
             </div>
         );
     }

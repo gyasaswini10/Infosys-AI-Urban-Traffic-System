@@ -1,94 +1,78 @@
 import React, { Component } from 'react';
 import { BASEURL, callApi } from '../api';
-import '../css/AdminDashboard.css'; // Re-use styles
+import '../css/AdminDashboard.css';
+import MenuBar from './MenuBar';
+import { CUSTOMER_MENU } from './MenuConstants';
 import TrafficDashboard from './TrafficDashboard';
+import RouteOptimization from './RouteOptimization';
+import TrafficPosting from './TrafficPosting';
+import TrafficSearch from './TrafficSearch';
+import Profile from './Profile';
 
 export default class CustomerDashboard extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            view: 'traffic' // 'traffic' or 'bookings' (legacy)
+            activeView: 'live_traffic', // Default
+            myBookings: []
         };
+        this.handleMenuClick = this.handleMenuClick.bind(this);
     }
 
     componentDidMount() {
-        this.fetchData();
         this.fetchMyBookings();
     }
 
-    fetchData() {
-        callApi("GET", BASEURL + "vehicle/all", null, (data) => {
-            try { 
-                const allVehicles = JSON.parse(data);
-                this.setState({ vehicles: Array.isArray(allVehicles) ? allVehicles.filter(v => v.status === 1) : [] }); 
-            } catch(e) { 
-                console.error("Vehicles parse error", e); 
-                this.setState({vehicles: []}); 
-            }
-        });
+    handleMenuClick(menuId) {
+        const selected = CUSTOMER_MENU.find(m => m.mid === menuId);
+        if (selected) {
+            this.setState({ activeView: selected.view });
+        }
     }
 
     fetchMyBookings() {
+        // Keeping legacy booking logic just in case "Travel History" needs it
         const email = this.props.userid;
         if(email) {
             callApi("GET", BASEURL + "booking/customer/" + email, null, (data) => {
                 try {
                      this.setState({ myBookings: JSON.parse(data) }); 
                 } catch(e) {
-                     console.error("Bookings parse error", e);
                      this.setState({ myBookings: [] });
                 }
             });
         }
     }
 
-    handleBook(vehicleId) {
-        const email = this.props.userid;
-        const startDate = prompt("Enter Start Date (YYYY-MM-DD):");
-        const endDate = prompt("Enter End Date (YYYY-MM-DD):");
+    renderContent() {
+        const { activeView, myBookings } = this.state;
 
-        if (startDate && endDate) {
-            const booking = {
-                vehicleId: vehicleId,
-                customerId: email,
-                startDate: startDate,
-                endDate: endDate,
-                status: 1 // Pending
-            };
-
-            callApi("POST", BASEURL + "booking/add", JSON.stringify(booking), (res) => {
-                alert(res.split("::")[1]);
-                this.fetchMyBookings();
-            });
-        }
-    }
-
-    render() {
-        const { vehicles, myBookings, view } = this.state;
-
-        return (
-            <div className="dashboard-container" style={{padding:'20px'}}>
-                <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-                    <h1>Citizen Dashboard</h1>
-                    <div>
-                        <button onClick={() => this.setState({view: 'traffic'})} style={{marginRight:'10px'}}>Traffic & Pollution</button>
-                        <button onClick={() => {sessionStorage.clear(); window.location.href='/login';}} style={{padding:'5px 10px', background:'#6c757d', color:'white', border:'none', borderRadius:'4px'}}>Logout</button>
+        switch (activeView) {
+            case 'live_traffic':
+                return <TrafficDashboard />;
+            case 'route_planner':
+                return <RouteOptimization />;
+            case 'traffic_alerts':
+                return (
+                    <div className="placeholder-view">
+                         <h2>My Traffic Alerts</h2>
+                         <p>Subscribed Areas: <strong>Hitech City, Jubilee Hills</strong></p>
+                         <ul className="alert-list">
+                             <li className="alert-item">🚧 Construction on Road No 45 (Delay 10m)</li>
+                             <li className="alert-item">🌧️ Heavy Rain Warning: Avoid Low lying areas</li>
+                         </ul>
                     </div>
-                </div>
-
-                {view === 'traffic' && (
-                    <div style={{marginTop:'20px'}}>
-                        <TrafficDashboard />
-                    </div>
-                )}
-
-                {view === 'bookings' && (
-                    <div className="bookings-list" style={{marginTop:'20px'}}>
-                        <h3>My Bookings</h3>
-                        {(!myBookings || myBookings.length === 0) ? <p>No bookings found.</p> : (
+                );
+            case 'post_report':
+                return <TrafficPosting />;
+            case 'travel_history':
+                return (
+                    <div className="tab-content">
+                        <h3>Travel History</h3>
+                        {(!myBookings || myBookings.length === 0) ? <p>No travel history found.</p> : (
                             <table className="dashboard-table">
                                 <thead>
-                                    <tr><th>ID</th><th>Vehicle ID</th><th>Dates</th><th>Status</th></tr>
+                                    <tr><th>ID</th><th>Vehicle</th><th>Dates</th><th>Status</th></tr>
                                 </thead>
                                 <tbody>
                                     {Array.isArray(myBookings) && myBookings.map(b => (
@@ -96,18 +80,31 @@ export default class CustomerDashboard extends Component {
                                             <td>#{b.bookingId}</td>
                                             <td>#{b.vehicleId}</td>
                                             <td>{b.startDate} to {b.endDate}</td>
-                                            <td>
-                                                <span className={`status-badge status-${b.status}`}>
-                                                    {b.status === 1 ? 'Pending' : b.status === 2 ? 'Approved' : 'Rejected'}
-                                                </span>
-                                            </td>
+                                            <td>{b.status === 1 ? 'Pending' : b.status === 2 ? 'Approved' : 'Rejected'}</td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                         )}
                     </div>
-                )}
+                );
+            case 'eco_routes':
+                 // Re-using route optimizer but we could pass a prop to pre-select 'eco'
+                 return <RouteOptimization defaultMode="eco" />;
+            case 'profile':
+                return <Profile />;
+            default:
+                return <TrafficDashboard />;
+        }
+    }
+
+    render() {
+        return (
+            <div className="dashboard-container">
+                <MenuBar manualMenus={CUSTOMER_MENU} onMenuClick={this.handleMenuClick} />
+                <div className="dashboard-content">
+                    {this.renderContent()}
+                </div>
             </div>
         );
     }
