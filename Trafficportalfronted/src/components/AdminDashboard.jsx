@@ -16,9 +16,26 @@ export default class AdminDashboard extends Component {
         super(props);
         this.state = {
             activeView: props.role === 3 ? 'my_routes' : 'city_overview', // Default view based on role
-            isDriver: props.role === 3
+            isDriver: props.role === 3,
+            driverStats: null
         };
         this.handleMenuClick = this.handleMenuClick.bind(this);
+    }
+
+    componentDidMount() {
+        if(this.state.isDriver && this.props.userid) {
+            this.fetchDriverStats();
+        }
+    }
+
+    fetchDriverStats() {
+        callApi("GET", BASEURL + "gamification/driver/" + this.props.userid, null, (data) => {
+            try {
+                this.setState({ driverStats: JSON.parse(data) });
+            } catch(e) {
+                console.error("Failed to parse gamification data", e);
+            }
+        });
     }
 
     handleMenuClick(menuId) {
@@ -147,44 +164,35 @@ export default class AdminDashboard extends Component {
                 case 'vehicle_health':
                     return <Maintenance role={role} userid={userid} />; // Reusing Maintenance for health
                 case 'incentives':
+                     const { driverStats } = this.state;
+                     if(!driverStats) return <div>Loading Rewards...</div>;
+                     
                      return (
                         <div className="tab-content">
                             <h3>🏆 Driver Incentives & Rewards</h3>
                             <div className="stats-container">
                                 <div className="stat-card gold">
                                     <h3>Eco Score</h3>
-                                    <h1>94/100</h1>
+                                    <h1>{driverStats.ecoScore}/100</h1>
                                     <p>Excellent Driving!</p>
                                 </div>
                                 <div className="stat-card blue">
                                     <h3>Reward Points</h3>
-                                    <h1>4,500</h1>
+                                    <h1>{driverStats.rewardPoints}</h1>
                                     <p>Redeemable</p>
                                 </div>
                             </div>
                             <h4>Your Achievements</h4>
                             <div className="achievements-list">
-                                <div className="achievement-item unlocked">
-                                    <span className="icon">🌱</span>
-                                    <div>
-                                        <strong>Eco Warrior</strong>
-                                        <p>Saved 50kg CO2 this month</p>
+                                {driverStats.achievements && driverStats.achievements.map((ach, idx) => (
+                                    <div key={idx} className={`achievement-item ${ach.status}`}>
+                                        <span className="icon">{ach.icon}</span>
+                                        <div>
+                                            <strong>{ach.title}</strong>
+                                            <p>{ach.desc}</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="achievement-item unlocked">
-                                    <span className="icon">⏱️</span>
-                                    <div>
-                                        <strong>On Time</strong>
-                                        <p>98% On-time arrivals</p>
-                                    </div>
-                                </div>
-                                <div className="achievement-item">
-                                    <span className="icon">🛡️</span>
-                                    <div>
-                                        <strong>Safety First</strong>
-                                        <p>No harsh braking for 1000km</p>
-                                    </div>
-                                </div>
+                                ))}
                             </div>
                         </div>
                     );
