@@ -69,6 +69,10 @@ public class UsersManager {
 		return UR.findByRole(role);
 	}
 
+	public java.util.List<Users> getAllUsers() {
+		return UR.findAll();
+	}
+
 	public String updateUserStatus(String email, int status) {
 		Users U = UR.findById(email).get();
 		U.setStatus(status);

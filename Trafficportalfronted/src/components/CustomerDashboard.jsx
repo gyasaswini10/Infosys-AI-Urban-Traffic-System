@@ -9,6 +9,29 @@ import RouteOptimization from './RouteOptimization';
 import TrafficPosting from './TrafficPosting';
 import TrafficSearch from './TrafficSearch';
 import Profile from './Profile';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 export default class CustomerDashboard extends Component {
     constructor(props) {
@@ -25,8 +48,10 @@ export default class CustomerDashboard extends Component {
     }
 
     handleMenuClick(menuId) {
-        const selected = CUSTOMER_MENU.find(m => m.mid === menuId);
+        console.log("Menu Clicked:", menuId); // Debugging
+        const selected = CUSTOMER_MENU.find(m => m.mid == menuId); // Loose equality for safety
         if (selected) {
+            console.log("Setting View:", selected.view); // Debugging
             this.setState({ activeView: selected.view });
         }
     }
@@ -45,56 +70,49 @@ export default class CustomerDashboard extends Component {
         }
     }
 
+    analyzeRoute() {
+        // Generate random mock data to simulate different route conditions
+        const baseTraffic = Math.floor(Math.random() * 40) + 20; // 20-60 base
+        const peakMultiplier = Math.random() * 2 + 1; // 1x to 3x surge
+        
+        const newData = [
+            baseTraffic, 
+            Math.floor(baseTraffic * peakMultiplier), 
+            Math.floor(baseTraffic * peakMultiplier * 0.9), 
+            baseTraffic + 10, 
+            baseTraffic, 
+            baseTraffic + 20, 
+            Math.floor(baseTraffic * 1.5), 
+            baseTraffic
+        ];
+
+        const peakStart = Math.floor(Math.random() * 4) + 7; // 7 AM to 10 AM
+        const peakEnd = peakStart + 2;
+
+        this.setState({
+            predictionData: {
+                labels: ['06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00'],
+                datasets: [{
+                    fill: true,
+                    label: 'Predicted Traffic Volume',
+                    data: newData,
+                    borderColor: peakMultiplier > 2 ? 'rgb(255, 99, 132)' : 'rgb(53, 162, 235)', // Red if high traffic
+                    backgroundColor: peakMultiplier > 2 ? 'rgba(255, 99, 132, 0.2)' : 'rgba(53, 162, 235, 0.2)',
+                    tension: 0.4
+                }]
+            },
+            predictionWarning: {
+                times: `${peakStart > 12 ? peakStart-12 : peakStart}:00 ${peakStart >= 12 ? 'PM' : 'AM'} - ${peakEnd > 12 ? peakEnd-12 : peakEnd}:00 ${peakEnd >= 12 ? 'PM' : 'AM'}`,
+                level: peakMultiplier > 2 ? 'CRITICAL' : peakMultiplier > 1.5 ? 'HIGH' : 'MODERATE'
+            }
+        });
+    }
+
     renderContent() {
-        const { activeView, myBookings } = this.state;
+        const { activeView, myBookings, predictionData, predictionWarning } = this.state;
 
         switch (activeView) {
-            case 'live_traffic':
-                return <TrafficDashboard />;
-            case 'route_planner':
-                return <RouteOptimization />;
-            case 'traffic_alerts':
-                return (
-                    <div className="tab-content">
-                         <h3>🔔 My Traffic Alerts</h3>
-                         
-                         <div className="alert-card critical">
-                            <div className="alert-header">
-                                <span className="icon">🌧️</span>
-                                <h4>Heavy Rain Warning</h4>
-                                <span className="time">10 mins ago</span>
-                            </div>
-                            <p>Severe waterlogging reported in <strong>Hitech City, Madhapur</strong>. Avoid low-lying areas. Expect delays of 45+ mins.</p>
-                         </div>
-
-                         <div className="alert-card warning">
-                            <div className="alert-header">
-                                <span className="icon">🚧</span>
-                                <h4>Road Construction</h4>
-                                <span className="time">1 hour ago</span>
-                            </div>
-                            <p><strong>Road No 45 Jubilee Hills</strong> is partially closed for Metro work. Use alternative route via KBR Park.</p>
-                         </div>
-
-                         <div className="alert-card info">
-                            <div className="alert-header">
-                                <span className="icon">📢</span>
-                                <h4>Rally Notification</h4>
-                                <span className="time">Yesterday</span>
-                            </div>
-                            <p>Political rally expected near <strong>Necklace Road</strong> tomorrow 10 AM - 2 PM. Plan travel accordingly.</p>
-                         </div>
-
-                         <div className="subscription-box">
-                             <h4>Manage Subscriptions</h4>
-                             <label><input type="checkbox" checked readOnly/> Peak Hour Alerts</label>
-                             <label><input type="checkbox" checked readOnly/> Accident Reports</label>
-                             <label><input type="checkbox" /> Air Quality Warnings</label>
-                         </div>
-                    </div>
-                );
-            case 'traffic_search':
-                return <TrafficSearch />;
+            // ... (cases)
             case 'travel_predictor':
                 return (
                     <div className="tab-content">
@@ -104,17 +122,30 @@ export default class CustomerDashboard extends Component {
                              <div style={{display:'flex', gap:'10px', margin:'15px 0'}}>
                                  <input type="text" placeholder="Source Point" className="input-field" style={{padding:'10px', flex:1}} />
                                  <input type="text" placeholder="Destination" className="input-field" style={{padding:'10px', flex:1}} />
-                                 <button className="btn-primary" onClick={() => alert("Predictions Loaded")}>Analyze</button>
+                                 <button className="btn-primary" onClick={() => this.analyzeRoute()}>Analyze</button>
                              </div>
-                             <div className="prediction-results" style={{marginTop:'20px'}}>
-                                 <div className="alert-card info">
-                                     <h4>⚠️ Peak Hour Warning</h4>
-                                     <p>Expect high congestion on this route between <strong>08:30 AM - 10:30 AM</strong> tomorrow.</p>
+                             
+                             {predictionData && (
+                                 <div className="prediction-results" style={{marginTop:'20px'}}>
+                                     <div className={`alert-card ${predictionWarning.level === 'CRITICAL' ? 'critical' : predictionWarning.level === 'HIGH' ? 'warning' : 'info'}`}>
+                                         <h4>⚠️ {predictionWarning.level} Congestion Warning</h4>
+                                         <p>Expect {predictionWarning.level.toLowerCase()} congestion on this route between <strong>{predictionWarning.times}</strong> tomorrow.</p>
+                                     </div>
+                                     <div style={{height:'300px', background:'#fff', padding:'10px', borderRadius:'8px', marginTop:'10px', boxShadow:'0 2px 4px rgba(0,0,0,0.05)'}}>
+                                         <Line 
+                                            options={{
+                                                responsive: true,
+                                                maintainAspectRatio: false,
+                                                plugins: {
+                                                    legend: { position: 'top' },
+                                                    title: { display: true, text: 'Hourly Traffic Trend Forecast (Tomorrow)' }
+                                                }
+                                            }} 
+                                            data={predictionData} 
+                                         />
+                                     </div>
                                  </div>
-                                 <div style={{height:'200px', background:'#eef2f7', display:'flex', alignItems:'center', justifyContent:'center', borderRadius:'8px', marginTop:'10px'}}>
-                                     📉 [Graph: Hourly Traffic Trend Forecast]
-                                 </div>
-                             </div>
+                             )}
                         </div>
                     </div>
                 );

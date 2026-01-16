@@ -91,23 +91,13 @@ export default class AdminDashboard extends Component {
     }
 
     fetchUsers() {
-        // Fetch users for all relevant roles (1:Admin, 2:Manager, 3:Driver)
-        // Note: Simple implementation fetching individually. In prod, better to have /users/all
-        const roles = [1, 2, 3];
-        let allUsers = [];
-        let completed = 0;
-
-        roles.forEach(r => {
-            callApi("GET", BASEURL + "users/role/" + r, null, (data) => {
-                try {
-                    const roleUsers = JSON.parse(data);
-                    allUsers = [...allUsers, ...roleUsers];
-                } catch(e) { }
-                completed++;
-                if(completed === roles.length) {
-                    this.setState({ users: allUsers });
-                }
-            });
+        // Optimization: Fetch ALL users in one query as requested
+        callApi("GET", BASEURL + "users/all", null, (data) => {
+            try {
+                this.setState({ users: JSON.parse(data) });
+            } catch(e) {
+                console.error("Error fetching users", e);
+            }
         });
     }
 

@@ -58,6 +58,11 @@ public class UsersController {
 		return um.getUsersByRole(roleId);
 	}
 
+	@GetMapping("/all")
+	public java.util.List<Users> getAllUsers() {
+		return um.getAllUsers();
+	}
+
 	@PostMapping("/updateStatus")
 	public String updateUserStatus(@RequestBody Map<String, Object> payload) {
 		String email = (String) payload.get("email");
