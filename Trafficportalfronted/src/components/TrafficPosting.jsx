@@ -70,14 +70,14 @@ class TrafficPosting extends Component {
   }
 
   savePost() {
-    let data = JSON.stringify({
+    let data = {
         id: this.state.id,
         title: this.state.title,
         location: this.state.location,
         type: this.state.type,
         severity: this.state.severity,
         description: this.state.description
-    });
+    };
     callApi("POST", BASEURL + "traffic/create", data, this.saveResponse)
   }
 

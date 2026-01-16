@@ -16,7 +16,7 @@ export default function Register() {
     };
 
     const handleRegister = () => {
-        callApi("POST", BASEURL + "users/signup", JSON.stringify(formData), (response) => {
+        callApi("POST", BASEURL + "users/signup", formData, (response) => {
             if (response.startsWith("200")) {
                 alert("Registration Successful");
                 navigate('/login');

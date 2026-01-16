@@ -55,10 +55,10 @@ const Projecthomepage = () => {
       return;
     }
 
-    const data = JSON.stringify({
+    const data = {
       email: loginData.email,
       password: loginData.password
-    });
+    };
 
     callApi("POST", BASEURL + "users/signin", data, (res) => {
       const rdata = res.split('::');
@@ -92,12 +92,12 @@ const Projecthomepage = () => {
       return;
     }
 
-    const data = JSON.stringify({
+    const data = {
       fullname,
       email,
       role,
       password
-    });
+    };
 
     callApi("POST", "http://localhost:8080/users/signup", data, (res) => {
       const resp = res.split('::');

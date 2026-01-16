@@ -29,17 +29,30 @@ export class Profile extends Component {
     let csr = getSession("csrid");
     if (csr !== "") {
       let data = { csrid: csr };
-      callApi("POST", BASEURL + "users/getdetails", data, (response) => {
+      console.log("Fetching profile with payload:", data); // Debug log
+      
+      fetch(BASEURL + "users/getdetails", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      })
+      .then(response => {
+        if (!response.ok) throw new Error(response.status + " " + response.statusText);
+        return response.text();
+      })
+      .then(response => {
         try {
+          console.log("Raw profile response:", response);
           let userData = JSON.parse(response);
           this.setState({
              user: userData,
-             originalUser: {...userData} // Create copy
+             originalUser: {...userData}
           });
         } catch (e) {
             console.error("Error parsing user data", e);
         }
-      });
+      })
+      .catch(error => console.error("Fetch profile error:", error));
     }
   }
 
@@ -73,18 +86,27 @@ export class Profile extends Component {
           return;
       }
       
-      callApi("POST", BASEURL + "users/update", this.state.user, (res) => {
+      console.log("Updating profile with payload:", this.state.user);
+      fetch(BASEURL + "users/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(this.state.user)
+      })
+      .then(res => {
+          if(!res.ok) throw new Error(res.status + " " + res.statusText);
+          return res.text();
+      })
+      .then(res => {
           let data = res.split("::");
           if(data[0] === "200") {
               alert(data[1]);
-              this.setState({
-                  isEditing: false,
-                  originalUser: {...this.state.user}
-              });
+              sessionStorage.setItem("user", JSON.stringify(this.state.user));
+              window.location.replace("/admin");
           } else {
               alert(data[1]);
           }
-      });
+      })
+      .catch(err => alert("Error updating profile: " + err));
   }
 
   getRoleName(role) {

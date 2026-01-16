@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import klu.repository.TrafficPostRepository;
 
-import klu.repository.TrafficPostRepository;
 
 @Service
 public class TrafficPostManager {

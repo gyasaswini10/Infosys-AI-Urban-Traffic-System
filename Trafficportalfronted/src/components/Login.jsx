@@ -10,13 +10,13 @@ export default function Login() {
 
     const handleLogin = () => {
         const payload = { email, password };
-        callApi("POST", BASEURL + "users/signin", JSON.stringify(payload), (response) => {
+        callApi("POST", BASEURL + "users/signin", payload, (response) => {
             if (response.startsWith("200")) {
                 const token = response.split("::")[1];
                 sessionStorage.setItem("token", token);
                 
                 // Fetch user details to determine role
-                callApi("POST", BASEURL + "users/getdetails", JSON.stringify({ csrid: token }), (user) => {
+                callApi("POST", BASEURL + "users/getdetails", { csrid: token }, (user) => {
                     sessionStorage.setItem("user", JSON.stringify(user));
                     const role = user.role;
                     if (role === 1) navigate('/admin');

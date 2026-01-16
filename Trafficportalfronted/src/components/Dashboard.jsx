@@ -20,7 +20,7 @@ export default class Dashboard extends Component {
     }
     
     // Fetch user details to decide where to go
-    callApi("POST", "http://localhost:8080/users/getdetails", JSON.stringify({"csrid":sid}), (res)=> {
+    callApi("POST", "http://localhost:8080/users/getdetails", {"csrid":sid}, (res)=> {
         try {
             let user = JSON.parse(res);
             sessionStorage.setItem("user", JSON.stringify(user));

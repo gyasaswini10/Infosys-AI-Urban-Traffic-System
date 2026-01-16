@@ -50,14 +50,14 @@ export default class FleetManagerDashboard extends Component {
     }
 
     updateVehicleStatus(id, status) {
-        callApi("POST", BASEURL + "vehicle/updateStatus", JSON.stringify({ vehicleId: id, status: status }), () => {
+        callApi("POST", BASEURL + "vehicle/updateStatus", { vehicleId: id, status: status }, () => {
             alert("Vehicle Status Updated");
             this.fetchData();
         });
     }
 
     updateDriverStatus(email, status) {
-        callApi("POST", BASEURL + "users/updateStatus", JSON.stringify({ email: email, status: status }), () => {
+        callApi("POST", BASEURL + "users/updateStatus", { email: email, status: status }, () => {
             alert("Driver Status Updated");
             this.fetchData();
         });
