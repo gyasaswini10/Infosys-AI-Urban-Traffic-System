@@ -10,6 +10,29 @@ import RouteOptimization from './RouteOptimization';
 import Profile from './Profile';
 import { ADMIN_MENU, DRIVER_MENU } from './MenuConstants';
 import { BASEURL, callApi } from '../api';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Line, Bar } from 'react-chartjs-2';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 export default class AdminDashboard extends Component {
     constructor(props) {
@@ -19,7 +42,8 @@ export default class AdminDashboard extends Component {
             isDriver: props.role === 3,
             driverStats: null,
             users: [],
-            diversions: []
+            diversions: [],
+            analyticsData: null
         };
         this.handleMenuClick = this.handleMenuClick.bind(this);
     }
@@ -30,7 +54,29 @@ export default class AdminDashboard extends Component {
         } else {
             this.fetchUsers();
             this.fetchDiversions();
+            this.fetchAnalytics();
         }
+    }
+
+    fetchAnalytics() {
+        // Fetch Overview
+        callApi("GET", BASEURL + "analytics/overview", null, (overviewData) => {
+            try {
+                const overview = JSON.parse(overviewData);
+                // Fetch Charts
+                callApi("GET", BASEURL + "analytics/charts", null, (chartData) => {
+                    try {
+                        const charts = JSON.parse(chartData);
+                        this.setState({ 
+                            analyticsData: {
+                                overview: overview,
+                                charts: charts
+                            }
+                        });
+                    } catch(e) {}
+                });
+            } catch(e) {}
+        });
     }
 
     fetchDiversions() {
@@ -194,22 +240,56 @@ export default class AdminDashboard extends Component {
                         </div>
                     );
                 case 'analytics':
+                    const congestionData = {
+                        labels: ['09:00', '12:00', '15:00', '18:00', '21:00'],
+                        datasets: [
+                            {
+                                label: 'Congestion Level',
+                                data: this.state.analyticsData ? this.state.analyticsData.charts.congestion : [],
+                                borderColor: 'rgb(255, 99, 132)',
+                                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                            },
+                        ],
+                    };
+                    const emissionData = {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [
+                            {
+                                label: 'CO2 Emissions (kg)',
+                                data: this.state.analyticsData ? this.state.analyticsData.charts.emissions : [],
+                                backgroundColor: 'rgba(53, 162, 235, 0.5)',
+                            },
+                        ],
+                    };
                     return (
                         <div className="tab-content">
                             <h3>📊 Smart City Analytics</h3>
-                            <TrafficDashboard showAnalyticsOnly={true} />
+                            <div className="analytics-summary" style={{display:'flex', gap:'20px', marginBottom:'20px'}}>
+                                <div className="stat-card" style={{borderLeft:'5px solid #3b82f6', background:'white', padding:'15px', borderRadius:'8px', boxShadow:'0 2px 4px rgba(0,0,0,0.1)', flex:1}}>
+                                    <div style={{fontSize:'0.9rem', color:'#666'}}>Total Fleet</div>
+                                    <div style={{fontSize:'1.8rem', fontWeight:'bold'}}>{this.state.analyticsData ? this.state.analyticsData.overview.totalFleet : '...'}</div>
+                                </div>
+                                <div className="stat-card" style={{borderLeft:'5px solid #10b981', background:'white', padding:'15px', borderRadius:'8px', boxShadow:'0 2px 4px rgba(0,0,0,0.1)', flex:1}}>
+                                    <div style={{fontSize:'0.9rem', color:'#666'}}>Active Routes</div>
+                                    <div style={{fontSize:'1.8rem', fontWeight:'bold'}}>{this.state.analyticsData ? this.state.analyticsData.overview.activeRoutes : '...'}</div>
+                                </div>
+                                <div className="stat-card" style={{borderLeft:'5px solid #f59e0b', background:'white', padding:'15px', borderRadius:'8px', boxShadow:'0 2px 4px rgba(0,0,0,0.1)', flex:1}}>
+                                    <div style={{fontSize:'0.9rem', color:'#666'}}>Trips Today</div>
+                                    <div style={{fontSize:'1.8rem', fontWeight:'bold'}}>{this.state.analyticsData ? this.state.analyticsData.overview.tripsToday : '...'}</div>
+                                </div>
+                            </div>
+                            
                             <div className="analytics-extra" style={{marginTop:'20px', display:'grid', gridTemplateColumns:'1fr 1fr', gap:'20px'}}>
                                 <div className="card-panel">
-                                    <h4>Congestion Trends (Last 7 Days)</h4>
-                                    {/* Mock Chart Placeholder */}
-                                    <div style={{height:'200px', background:'#f8f9fa', display:'flex', alignItems:'center', justifyContent:'center', border:'1px dashed #ccc'}}>
-                                        📈 [Line Chart: Peak Hours 09:00 & 18:00]
+                                    <h4>Congestion Trends (Today)</h4>
+                                    <div style={{height:'300px', padding:'10px'}}>
+                                        {this.state.analyticsData ? <Line options={{responsive:true, maintainAspectRatio:false}} data={congestionData} /> : 'Loading Chart...'}
                                     </div>
                                 </div>
                                 <div className="card-panel">
-                                    <h4>Emissions Analysis</h4>
-                                    <div style={{height:'200px', background:'#f8f9fa', display:'flex', alignItems:'center', justifyContent:'center', border:'1px dashed #ccc'}}>
-                                        📉 [Bar Chart: CO2 Reduced by 15% this week]
+                                    <h4>Emissions Analysis (Weekly)</h4>
+                                    <div style={{height:'300px', padding:'10px'}}>
+                                        {this.state.analyticsData ? <Bar options={{responsive:true, maintainAspectRatio:false}} data={emissionData} /> : 'Loading Chart...'}
                                     </div>
                                 </div>
                             </div>

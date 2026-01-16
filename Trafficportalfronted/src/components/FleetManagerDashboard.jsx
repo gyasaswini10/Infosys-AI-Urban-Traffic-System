@@ -74,21 +74,25 @@ export default class FleetManagerDashboard extends Component {
                         <h3>Active Fleet Status</h3>
                         <p>{Array.isArray(vehicles) ? vehicles.filter(v => v.status === 1).length : 0} vehicles currently active.</p>
                         
-                        <h4>Vehicle Approval Queue</h4>
+                        <h4>Full Fleet Inventory & Approval</h4>
                          <table className="dashboard-table">
                             <thead>
                                 <tr><th>ID</th><th>Reg No</th><th>Model</th><th>Status</th><th>Actions</th></tr>
                             </thead>
                             <tbody>
-                                {Array.isArray(vehicles) && vehicles.filter(v => v.status === 3).length === 0 && <tr><td colSpan="5">No pending vehicles</td></tr>}
-                                {Array.isArray(vehicles) && vehicles.filter(v => v.status === 3).map(v => (
+                                {Array.isArray(vehicles) && vehicles.length === 0 && <tr><td colSpan="5">No vehicles in database</td></tr>}
+                                {Array.isArray(vehicles) && vehicles.map(v => (
                                     <tr key={v.vehicleId}>
                                         <td>{v.vehicleId}</td><td>{v.regNo}</td><td>{v.model}</td>
-                                        <td><span className="status-badge status-pending">Pending</span></td>
+                                        <td>
+                                            <span className={`status-badge status-${v.status}`}>
+                                                {v.status === 1 ? 'Active' : v.status === 3 ? 'Pending' : v.status === 4 ? 'Rejected' : 'Inactive'}
+                                            </span>
+                                        </td>
                                         <td>
                                             <div className="action-btn-group">
-                                                <button onClick={() => this.updateVehicleStatus(v.vehicleId, 1)} className="btn-approve">Approve</button>
-                                                <button onClick={() => this.updateVehicleStatus(v.vehicleId, 4)} className="btn-reject">Reject</button>
+                                                {v.status !== 1 && <button onClick={() => this.updateVehicleStatus(v.vehicleId, 1)} className="btn-approve">Approve</button>}
+                                                {v.status !== 4 && <button onClick={() => this.updateVehicleStatus(v.vehicleId, 4)} className="btn-reject">Reject</button>}
                                             </div>
                                         </td>
                                     </tr>

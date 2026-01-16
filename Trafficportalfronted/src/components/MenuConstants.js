@@ -38,6 +38,5 @@ export const CUSTOMER_MENU = [
     { mid: 6, menu: "Travel Predictor", icon: "/images/clock.png", view: "travel_predictor" },
     { mid: 7, menu: "Public Transport", icon: "/images/bus.png", view: "public_transport" },
     { mid: 8, menu: "Travel History", icon: "/images/history.png", view: "travel_history" },
-    { mid: 9, menu: "Eco Routes", icon: "/images/eco.png", view: "eco_routes" },
     { mid: 10, menu: "Profile", icon: "/images/profile.png", view: "profile" }
 ];
