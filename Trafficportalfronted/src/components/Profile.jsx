@@ -28,7 +28,7 @@ export class Profile extends Component {
   fetchProfile() {
     let csr = getSession("csrid");
     if (csr !== "") {
-      let data = JSON.stringify({ csrid: csr });
+      let data = { csrid: csr };
       callApi("POST", BASEURL + "users/getdetails", data, (response) => {
         try {
           let userData = JSON.parse(response);
@@ -73,7 +73,7 @@ export class Profile extends Component {
           return;
       }
       
-      callApi("POST", BASEURL + "users/update", JSON.stringify(this.state.user), (res) => {
+      callApi("POST", BASEURL + "users/update", this.state.user, (res) => {
           let data = res.split("::");
           if(data[0] === "200") {
               alert(data[1]);

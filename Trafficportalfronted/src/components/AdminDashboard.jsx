@@ -18,7 +18,8 @@ export default class AdminDashboard extends Component {
             activeView: props.role === 3 ? 'my_routes' : 'city_overview', // Default view based on role
             isDriver: props.role === 3,
             driverStats: null,
-            users: []
+            users: [],
+            diversions: []
         };
         this.handleMenuClick = this.handleMenuClick.bind(this);
     }
@@ -28,7 +29,19 @@ export default class AdminDashboard extends Component {
             this.fetchDriverStats();
         } else {
             this.fetchUsers();
+            this.fetchDiversions();
         }
+    }
+
+    fetchDiversions() {
+        callApi("GET", BASEURL + "traffic/read", null, (data) => {
+            try {
+                const posts = JSON.parse(data);
+                // Filter posts where type is "Diversion"
+                const activeDiversions = posts.filter(p => p.type === "Diversion");
+                this.setState({ diversions: activeDiversions });
+            } catch(e) {}
+        });
     }
 
     fetchUsers() {
@@ -77,6 +90,42 @@ export default class AdminDashboard extends Component {
         }
     }
 
+    createDiversion() {
+        const road = prompt("Enter Road Name:");
+        const reason = prompt("Enter Reason (e.g. Construction, VIP):");
+        if(road && reason) {
+            const payload = {
+                title: road,
+                description: reason,
+                type: "Diversion",
+                location: road, // Using road name as location for simplicity
+                severity: "High",
+                status: 1 // Verified by Admin
+            };
+
+            fetch(BASEURL + "traffic/create", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.text())
+            .then(resp => {
+                if(resp.includes("200")) {
+                     alert(`🚧 New Diversion Created in Database!`);
+                     this.fetchDiversions(); // Refresh list
+                } else {
+                     alert("Failed to create diversion");
+                }
+            });
+        }
+    }
+
+    overrideSignal(junction, action) {
+        if(confirm(`⚠️ CONFIRM: Force ${action} at ${junction}? This will override AI control.`)) {
+            alert(`✅ signal at ${junction} is now FORCED ${action.toUpperCase()}`);
+        }
+    }
+
     fetchDriverStats() {
         callApi("GET", BASEURL + "gamification/driver/" + this.props.userid, null, (data) => {
             try {
@@ -112,10 +161,13 @@ export default class AdminDashboard extends Component {
                                 <div className="card-panel">
                                     <h4>Active Diversions</h4>
                                     <ul className="alert-list">
-                                        <li className="alert-item">🚧 <strong>Road No 45</strong>: Closed due to VIP movement (Ends: 18:00)</li>
-                                        <li className="alert-item">🚧 <strong>Hitech City Flyover</strong>: Maintenance Work (Ends: 06:00)</li>
+                                        {this.state.diversions.length > 0 ? this.state.diversions.map((d, i) => (
+                                            <li key={i} className="alert-item">🚧 <strong>{d.title}</strong>: {d.description}</li>
+                                        )) : (
+                                            <li className="alert-item">No active diversions found in DB.</li>
+                                        )}
                                     </ul>
-                                    <button className="btn-add" style={{marginTop:'10px'}}>+ Create New Diversion</button>
+                                    <button className="btn-add" style={{marginTop:'10px'}} onClick={() => this.createDiversion()}>+ Create New Diversion</button>
                                 </div>
                                 <div className="card-panel">
                                     <h4>Signal Priority Override</h4>
@@ -126,7 +178,7 @@ export default class AdminDashboard extends Component {
                                             <span className="light yellow"></span>
                                             <span className="light green"></span>
                                         </div>
-                                        <button className="btn-approve">Force Green (Emergency)</button>
+                                        <button className="btn-approve" onClick={() => this.overrideSignal('Jubilee Checkpost', 'Green')}>Force Green (Emergency)</button>
                                     </div>
                                     <div className="signal-control" style={{marginTop:'10px'}}>
                                         <label>KBR Park Junction</label>
@@ -135,7 +187,7 @@ export default class AdminDashboard extends Component {
                                             <span className="light yellow"></span>
                                             <span className="light green active"></span>
                                         </div>
-                                        <button className="btn-approve">Force Red (Block)</button>
+                                        <button className="btn-approve" style={{background:'#dc3545'}} onClick={() => this.overrideSignal('KBR Park Junction', 'Red')}>Force Red (Block)</button>
                                     </div>
                                 </div>
                             </div>
