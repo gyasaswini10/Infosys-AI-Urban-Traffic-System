@@ -19,6 +19,14 @@ public class UsersManager {
 	public String addUser(Users U) {
 		if (UR.validateEmail(U.getEmail()) > 0)
 			return "401::Email already exist";
+
+		// Set status based on role
+		if (U.getRole() == 1 || U.getRole() == 4) {
+			U.setStatus(1); // Auto-approve Admin and Customer
+		} else {
+			U.setStatus(0); // Pending for Driver and Fleet Manager
+		}
+
 		UR.save(U);
 		return "200::User Registered Successfully";
 	}
@@ -31,6 +39,13 @@ public class UsersManager {
 
 	public String ValidateCredentials(String email, String password) {
 		if (UR.validateCresentials(email, password) > 0) {
+			Users U = UR.findById(email).get(); // Fetch user to check status
+			if (U.getStatus() != null) {
+				if (U.getStatus() == 2)
+					return "403::Admin has rejected you, contact admin first";
+				if (U.getStatus() == 0)
+					return "403::Your account is pending Admin approval";
+			}
 			String token = JWT.generateToken(email);
 			return "200::" + token;
 		}
