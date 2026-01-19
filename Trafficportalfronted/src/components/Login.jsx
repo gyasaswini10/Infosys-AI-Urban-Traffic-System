@@ -25,6 +25,8 @@ export default function Login() {
                     else if (role === 4) navigate('/customer');
                     else navigate('/');
                 });
+            } else if (response.startsWith("403")) {
+                alert(response.split("::")[1]);
             } else {
                 alert("Invalid Credentials");
             }
