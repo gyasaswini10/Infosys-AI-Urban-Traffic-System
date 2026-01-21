@@ -32,31 +32,47 @@ export default class Maintenance extends Component {
         const dueSoonCount = predictions.filter(p => p.status === 'Due Soon').length;
 
         return (
-            <div className="admin-dashboard">
-                <div className="dashboard-header">
+            <div className="tab-content" style={{ padding: '0' }}>
+                <div className="section-header" style={{ marginBottom: '20px' }}>
                     <h2>Predictive Maintenance</h2>
+                    <button className="btn-primary" style={{ width: 'auto' }} onClick={() => this.loadPredictions(JSON.stringify(predictions))}>Refresh Analysis</button>
                 </div>
 
-                <div className="stats-container">
-                    <div className="stat-card" style={{ background: 'linear-gradient(135deg, #ef4444, #b91c1c)' }}>
-                        <h3>Critical Attention</h3>
-                        <p>{criticalCount}</p>
+                <div className="metrics-container">
+                    <div className="metric-card" style={{ borderLeft: '4px solid #ef4444' }}>
+                        <div className="metric-info">
+                            <h3>Critical Attention</h3>
+                            <h1 style={{ color: '#ef4444' }}>{criticalCount}</h1>
+                        </div>
+                        <div className="icon-box" style={{ background: '#fee2e2', color: '#ef4444' }}>
+                            <i className="fas fa-exclamation-triangle"></i>
+                        </div>
                     </div>
-                    <div className="stat-card" style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)' }}>
-                        <h3>Service Due Soon</h3>
-                        <p>{dueSoonCount}</p>
+                    <div className="metric-card" style={{ borderLeft: '4px solid #f59e0b' }}>
+                        <div className="metric-info">
+                            <h3>Service Due Soon</h3>
+                            <h1 style={{ color: '#f59e0b' }}>{dueSoonCount}</h1>
+                        </div>
+                        <div className="icon-box" style={{ background: '#fef3c7', color: '#f59e0b' }}>
+                            <i className="fas fa-clock"></i>
+                        </div>
                     </div>
-                    <div className="stat-card" style={{ background: 'linear-gradient(135deg, #10b981, #047857)' }}>
-                        <h3>Healthy Fleet</h3>
-                        <p>{predictions.length - criticalCount - dueSoonCount}</p>
+                    <div className="metric-card" style={{ borderLeft: '4px solid #10b981' }}>
+                        <div className="metric-info">
+                            <h3>Healthy Fleet</h3>
+                            <h1 style={{ color: '#10b981' }}>{predictions.length - criticalCount - dueSoonCount}</h1>
+                        </div>
+                        <div className="icon-box" style={{ background: '#d1fae5', color: '#10b981' }}>
+                            <i className="fas fa-check-circle"></i>
+                        </div>
                     </div>
                 </div>
 
-                <div className="vehicle-list-container">
-                    <h3>Vehicle Health Report</h3>
+                <div className="card-panel">
+                    <h4 style={{ marginBottom: '20px' }}>Vehicle Health Report</h4>
                     {loading ? <p>Loading analysis...</p> : (
                         <div className="table-responsive">
-                            <table>
+                            <table className="dashboard-table">
                                 <thead>
                                     <tr>
                                         <th>Reg No</th>
@@ -71,45 +87,41 @@ export default class Maintenance extends Component {
                                 <tbody>
                                     {predictions.map((p, index) => (
                                         <tr key={index}>
-                                            <td>{p.regNo}</td>
+                                            <td style={{ fontWeight: '600' }}>{p.regNo}</td>
                                             <td>
-                                                <div className="health-bar-container">
-                                                    <div 
-                                                        className="health-bar" 
+                                                <div className="health-bar-container" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                    <div
                                                         style={{
-                                                            width: `${p.engineHealth}%`, 
-                                                            backgroundColor: p.engineHealth < 70 ? '#ef4444' : '#10b981'
+                                                            width: '60px', height: '6px', background: '#e5e7eb', borderRadius: '3px', overflow: 'hidden'
                                                         }}
-                                                    ></div>
-                                                    <span>{p.engineHealth}%</span>
+                                                    >
+                                                        <div style={{ width: `${p.engineHealth}%`, height: '100%', background: p.engineHealth < 70 ? '#ef4444' : '#10b981' }}></div>
+                                                    </div>
+                                                    <span style={{ fontSize: '0.85rem', width: '30px' }}>{p.engineHealth}%</span>
                                                 </div>
                                             </td>
                                             <td>
-                                                <div className="health-bar-container">
-                                                    <div 
-                                                        className="health-bar" 
+                                                <div className="health-bar-container" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                    <div
                                                         style={{
-                                                            width: `${p.tireHealth}%`, 
-                                                            backgroundColor: p.tireHealth < 60 ? '#ef4444' : '#10b981'
+                                                            width: '60px', height: '6px', background: '#e5e7eb', borderRadius: '3px', overflow: 'hidden'
                                                         }}
-                                                    ></div>
-                                                    <span>{p.tireHealth}%</span>
+                                                    >
+                                                        <div style={{ width: `${p.tireHealth}%`, height: '100%', background: p.tireHealth < 60 ? '#ef4444' : '#10b981' }}></div>
+                                                    </div>
+                                                    <span style={{ fontSize: '0.85rem', width: '30px' }}>{p.tireHealth}%</span>
                                                 </div>
                                             </td>
                                             <td>{p.mileage.toFixed(1)} km</td>
                                             <td>
-                                                <span 
-                                                    className="status-badge"
-                                                    style={{
-                                                        backgroundColor: p.status === 'Critical' ? '#fee2e2' : p.status === 'Due Soon' ? '#fef3c7' : '#d1fae5',
-                                                        color: p.status === 'Critical' ? '#991b1b' : p.status === 'Due Soon' ? '#92400e' : '#065f46'
-                                                    }}
+                                                <span
+                                                    className={`status-badge ${p.status === 'Critical' ? 'status-inactive' : p.status === 'Due Soon' ? 'status-pending' : 'status-active'}`}
                                                 >
                                                     {p.status}
                                                 </span>
                                             </td>
                                             <td>{p.action}</td>
-                                            <td style={{color: '#6b7280', fontSize: '0.9em'}}>{p.issues || 'None'}</td>
+                                            <td style={{ color: '#6b7280', fontSize: '0.9em', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={p.issues}>{p.issues || 'None'}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -117,19 +129,6 @@ export default class Maintenance extends Component {
                         </div>
                     )}
                 </div>
-                
-                <style>{`
-                    .health-bar-container {
-                        display: flex;
-                        align-items: center;
-                        gap: 8px;
-                        width: 100px;
-                    }
-                    .health-bar {
-                        height: 6px;
-                        border-radius: 3px;
-                    }
-                `}</style>
             </div>
         );
     }

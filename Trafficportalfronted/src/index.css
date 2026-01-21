@@ -1,12 +1,27 @@
-html,body{
+/* Global Theme Variables */
+:root {
+  --primary-blue: #225e76;
+  /* Deep Blue from Homepage */
+  --dark-blue: #164e63;
+  --accent-cyan: #33b5e5;
+  --bg-light: #f4f6f8;
+  --text-dark: #333333;
+  --text-white: #ffffff;
+  --sidebar-active: #1a4a5e;
+  --sidebar-hover: #2c7a99;
+}
+
+html,
+body {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
-  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
 }
-#root{
+
+#root {
   width: 100%;
   height: 100%;
 }

@@ -131,78 +131,91 @@ const Projecthomepage = () => {
       {/* Navbar */}
       <nav className="navbar">
         <div className="navbar-brand">
-          <div className="logo-icon">🚦</div>
+          <span className="logo-icon">🌀</span>
           <span className="brand-name">TrafficPortal</span>
         </div>
-        <div className="navbar-actions">
-          <button className="nav-btn-signin" onClick={() => openValidModal('login')}>
-            Sign In
-          </button>
+        <div className="navbar-links">
+          <a href="#home" className="nav-link">Home</a>
+          <a href="#about" className="nav-link">About</a>
+          <a href="#services" className="nav-link">Services</a>
+          <a href="#testimonials" className="nav-link">Testimonials</a>
+          <a href="#contact" className="nav-link">Contact</a>
+          <button className="nav-link" style={{ fontWeight: '700' }} onClick={() => openValidModal('login')}>LOGIN</button>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <header className="hero-section">
-        <div className="hero-content">
-          <h1 className="hero-title">
-            Smart Traffic System – <span className="highlight-text">Making Roads Safer</span>
-          </h1>
-          <p className="hero-subtitle">
-            Welcome to Smart Traffic Management.<br/>
-            We use technology to monitor traffic, reduce congestion, and improve road safety.
-          </p>
-          <div className="hero-buttons">
-            <button className="cta-button primary" onClick={() => openValidModal('signup')}>
-              Get Started
-            </button>
-            <button className="cta-button secondary" onClick={() => openValidModal('login')}>
-              Login
-            </button>
-          </div>
+      <header id="home" className="hero-section">
+        <div className="hero-text">
+          <h1 className="hero-title">Welcome to<br />TrafficPortal</h1>
+          <p className="hero-subtitle">Transforming Your Traffic Experience for Smarter Cities</p>
+        </div>
+        <div className="hero-image-container" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1578575437130-527eed3abbec?q=80&w=2070&auto=format&fit=crop')" }}>
+          {/* Using a high quality Unsplash image of a port/logistics hub similar to screenshot */}
         </div>
       </header>
 
-      {/* Info Sections Grid */}
-      <section className="info-grid">
-        {/* Features */}
-        <div className="info-card">
-          <div className="card-header">Our Features</div>
-          <ul className="card-list">
-            <li>Real-time traffic monitoring</li>
-            <li>Vehicle counting and tracking</li>
-            <li>Traffic signal control system</li>
-            <li>Accident and congestion alerts</li>
-            <li>Data reports for better planning</li>
-          </ul>
-        </div>
-
-        {/* For Drivers */}
-        <div className="info-card">
-          <div className="card-header">For Drivers</div>
-          <ul className="card-list">
-            <li>Check live traffic updates</li>
-            <li>Find fastest routes</li>
-            <li>Avoid traffic jams</li>
-          </ul>
-        </div>
-
-        {/* For Authorities */}
-        <div className="info-card">
-          <div className="card-header">For Authorities</div>
-          <ul className="card-list">
-            <li>Control traffic signals smartly</li>
-            <li>Analyze traffic flow</li>
-            <li>Improve city transport</li>
-          </ul>
+      {/* About / Discover Section */}
+      <section id="about" className="about-section" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1473186505569-9c61870c11f9?q=80&w=2070&auto=format&fit=crop')" }}>
+        <div className="about-overlay-card">
+          <h2 className="about-title">Discover TrafficPortal</h2>
+          <p className="about-desc">
+            Your Gateway to Smarter Traffic Solutions.
+            Monitor city traffic in real-time, plan your travel efficiently, and actively contribute to city traffic insights.
+            Our platform is designed to promote smart city initiatives by empowering citizens with robust planning tools.
+          </p>
         </div>
       </section>
 
-      {/* Slogan & Footer */}
-      <footer className="footer-section">
-        <h2 className="footer-slogan">Safe Roads. Smart Cities. Better Travel.</h2>
-        <div className="footer-flow">
-          <span>Track</span> <span className="arrow">→</span> <span>Manage</span> <span className="arrow">→</span> <span>Improve</span>
+      {/* Testimonials Section */}
+      <section id="testimonials" className="testimonials-section">
+        <h2 className="section-header">Testimonials</h2>
+
+        <div className="testimonial-card">
+          <div className="testi-image" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1542596594-649edbc13630?q=80&w=1974&auto=format&fit=crop')" }}></div>
+          <div className="testi-content">
+            <div className="stars">★★★★★</div>
+            <div style={{ height: '10px' }}></div>
+            <div className="testi-role">Professional Driver and Logistics Planner</div>
+            <h3 className="testi-name">Michael Johnson</h3>
+            <p className="testi-text">
+              "The platform's travel planning tools helped me save time and frustration during peak hours. Highly recommended for anyone navigating the city!"
+            </p>
+          </div>
         </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="contact-section">
+        <h2 className="contact-header">CONTACT</h2>
+
+        <div className="map-background-container" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=1774&auto=format&fit=crop')" }}>
+          <div className="contact-form-card">
+            <div className="contact-info">
+              <div>
+                <strong>Address</strong><br />
+                Manhattan, New York, NY, United States
+              </div>
+              <div>
+                <strong>Mon-Fri:</strong> 08:00-19:00
+              </div>
+            </div>
+
+            <input type="text" className="form-input" placeholder="Name" />
+            <input type="text" className="form-input" placeholder="Phone" />
+            <input type="email" className="form-input full-width" placeholder="Email address" />
+            <textarea className="form-input full-width" rows="4" placeholder="Message"></textarea>
+
+            <button className="contact-btn">Contact Us</button>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="footer">
+        <div>TrafficPortal</div>
+        <div>Copyright © 2026 All rights reserved</div>
+        <div>Powered By SITE123 - Free website builder</div>
       </footer>
 
       {/* Glassmorphism Modal Overlay */}
@@ -213,33 +226,33 @@ const Projecthomepage = () => {
             <div className="modal-header">
               <h2>{modalType === 'login' ? 'Welcome Back' : 'Create Account'}</h2>
             </div>
-            
+
             <div className="modal-body">
               {modalType === 'login' && (
                 <div className="form-group">
                   <div className="input-wrapper">
-                      <label>Email Address</label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={loginData.email}
-                        onChange={handleLoginChange}
-                        placeholder="Enter your email"
-                        autoFocus
-                      />
+                    <label>Email Address</label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={loginData.email}
+                      onChange={handleLoginChange}
+                      placeholder="Enter your email"
+                      autoFocus
+                    />
                   </div>
                   <div className="input-wrapper">
-                      <label>Password</label>
-                      <input
-                        type="password"
-                        name="password"
-                        value={loginData.password}
-                        onChange={handleLoginChange}
-                        placeholder="Enter your password"
-                      />
+                    <label>Password</label>
+                    <input
+                      type="password"
+                      name="password"
+                      value={loginData.password}
+                      onChange={handleLoginChange}
+                      placeholder="Enter your password"
+                    />
                   </div>
-                  <div className="forgot-password" style={{textAlign:'right', fontSize:'0.85rem'}}>
-                    <span onClick={handleForgotPassword} style={{color:'#007bff', cursor:'pointer'}}>Forgot Password?</span>
+                  <div className="forgot-password">
+                    <span onClick={handleForgotPassword}>Forgot Password?</span>
                   </div>
                   <button className="submit-btn" onClick={handleLoginSubmit}>Sign In</button>
                   <div className="switch-mode">
@@ -251,55 +264,55 @@ const Projecthomepage = () => {
               {modalType === 'signup' && (
                 <div className="form-group">
                   <div className="input-wrapper">
-                      <label>Full Name</label>
-                      <input
-                        type="text"
-                        name="fullname"
-                        value={signupData.fullname}
-                        onChange={handleSignupChange}
-                        placeholder="John Doe"
-                      />
-                   </div>
-                   <div className="input-wrapper">
-                      <label>Email</label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={signupData.email}
-                        onChange={handleSignupChange}
-                        placeholder="email@example.com"
-                      />
-                   </div>
-                   <div className="input-wrapper">
-                      <label>Role</label>
-                      <select name="role" value={signupData.role} onChange={handleSignupChange}>
-                        <option value="">Select Role</option>
-                        <option value="1">Admin</option>
-                        <option value="2">Manager</option>
-                        <option value="3">Driver</option>
-                        <option value="4">Customer</option>
-                      </select>
-                   </div>
-                   <div className="input-wrapper">
-                      <label>Password</label>
-                      <input
-                        type="password"
-                        name="password"
-                        value={signupData.password}
-                        onChange={handleSignupChange}
-                        placeholder="Create Password"
-                      />
-                   </div>
-                   <div className="input-wrapper">
-                      <label>Confirm Password</label>
-                      <input
-                        type="password"
-                        name="confirmPassword"
-                        value={signupData.confirmPassword}
-                        onChange={handleSignupChange}
-                        placeholder="Confirm Password"
-                      />
-                   </div>
+                    <label>Full Name</label>
+                    <input
+                      type="text"
+                      name="fullname"
+                      value={signupData.fullname}
+                      onChange={handleSignupChange}
+                      placeholder="John Doe"
+                    />
+                  </div>
+                  <div className="input-wrapper">
+                    <label>Email</label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={signupData.email}
+                      onChange={handleSignupChange}
+                      placeholder="email@example.com"
+                    />
+                  </div>
+                  <div className="input-wrapper">
+                    <label>Role</label>
+                    <select name="role" value={signupData.role} onChange={handleSignupChange}>
+                      <option value="">Select Role</option>
+                      <option value="1">Admin</option>
+                      <option value="2">Manager</option>
+                      <option value="3">Driver</option>
+                      <option value="4">Customer</option>
+                    </select>
+                  </div>
+                  <div className="input-wrapper">
+                    <label>Password</label>
+                    <input
+                      type="password"
+                      name="password"
+                      value={signupData.password}
+                      onChange={handleSignupChange}
+                      placeholder="Create Password"
+                    />
+                  </div>
+                  <div className="input-wrapper">
+                    <label>Confirm Password</label>
+                    <input
+                      type="password"
+                      name="confirmPassword"
+                      value={signupData.confirmPassword}
+                      onChange={handleSignupChange}
+                      placeholder="Confirm Password"
+                    />
+                  </div>
                   <button className="submit-btn" onClick={handleSignupSubmit}>Register</button>
                   <div className="switch-mode">
                     Already have an account? <span onClick={() => setModalType('login')}>Sign In</span>

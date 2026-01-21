@@ -48,11 +48,11 @@ public class RouteService {
 
             if (startCoords != null && endCoords != null) {
                 // 2. Call OSRM Route Service (Free)
-                // Format: /route/v1/driving/{lon},{lat};{lon},{lat}?overview=full
+                // Request alternatives=3 to try getting multiple paths
                 String osrmUrl = "http://router.project-osrm.org/route/v1/driving/"
                         + startCoords[1] + "," + startCoords[0] + ";"
                         + endCoords[1] + "," + endCoords[0]
-                        + "?overview=full"; // full polyline
+                        + "?overview=full&alternatives=3";
 
                 RestTemplate restTemplate = new RestTemplate();
                 String result = restTemplate.getForObject(osrmUrl, String.class);
@@ -62,46 +62,48 @@ public class RouteService {
                 if (jsonResponse.get("code").getAsString().equals("Ok")) {
                     JsonArray osrmRoutes = jsonResponse.getAsJsonArray("routes");
 
-                    // OSRM usually returns 1 main route, but can support alternatives. We verify
-                    // just the first one here.
-                    for (int i = 0; i < osrmRoutes.size(); i++) {
-                        JsonObject routeObj = osrmRoutes.get(i).getAsJsonObject();
+                    // We need exactly 3 routes: Low, Medium, High Traffic
+                    // Base route is usually the fastest (Low Traffic)
+                    JsonObject bestRoute = osrmRoutes.get(0).getAsJsonObject();
+                    double baseDuration = bestRoute.get("duration").getAsDouble();
+                    double baseDistance = bestRoute.get("distance").getAsDouble();
+                    String baseGeometry = bestRoute.get("geometry").getAsString();
 
-                        double durationSeconds = routeObj.get("duration").getAsDouble();
-                        double distanceMeters = routeObj.get("distance").getAsDouble();
-                        String geometry = routeObj.get("geometry").getAsString(); // Encoded polyline
+                    // 1. Low Traffic (Fastest)
+                    routes.add(
+                            createRouteMap("Low Traffic", baseDuration, baseDistance, "Low", "#10b981", baseGeometry));
 
-                        Map<String, Object> routeMap = new HashMap<>();
-                        routeMap.put("type", "Recommended Route");
-                        // Format Duration
-                        int minutes = (int) (durationSeconds / 60);
-                        routeMap.put("eta", minutes + " mins");
-                        // Format Distance
-                        double km = Math.round((distanceMeters / 1000.0) * 10.0) / 10.0;
-                        routeMap.put("distance", km + " km");
+                    // 2. Medium Traffic (Simulated or Real Alt)
+                    if (osrmRoutes.size() > 1) {
+                        JsonObject alt = osrmRoutes.get(1).getAsJsonObject();
+                        routes.add(createRouteMap("Medium Traffic", alt.get("duration").getAsDouble(),
+                                alt.get("distance").getAsDouble(), "Medium", "#f59e0b",
+                                alt.get("geometry").getAsString()));
+                    } else {
+                        // Simulate Medium: +15% duration
+                        routes.add(createRouteMap("Medium Traffic", baseDuration * 1.15, baseDistance, "Medium",
+                                "#f59e0b", baseGeometry));
+                    }
 
-                        routeMap.put("trafficCondition", "Normal"); // OSRM basic doesn't have real-time traffic
-                        routeMap.put("color", "#10b981"); // Green
-                        routeMap.put("encodedPath", geometry);
-
-                        routes.add(routeMap);
+                    // 3. High Traffic (Simulated or Real Alt)
+                    if (osrmRoutes.size() > 2) {
+                        JsonObject alt = osrmRoutes.get(2).getAsJsonObject();
+                        routes.add(createRouteMap("High Traffic", alt.get("duration").getAsDouble(),
+                                alt.get("distance").getAsDouble(), "High", "#ef4444",
+                                alt.get("geometry").getAsString()));
+                    } else {
+                        // Simulate High: +30% duration
+                        routes.add(createRouteMap("High Traffic", baseDuration * 1.30, baseDistance, "High", "#ef4444",
+                                baseGeometry));
                     }
                 }
             } else {
-                Map<String, Object> errorRoute = new HashMap<>();
-                errorRoute.put("type", "Address not found");
-                errorRoute.put("eta", "--");
-                errorRoute.put("distance", "--");
-                routes.add(errorRoute);
+                routes.add(createErrorRoute("Address not found"));
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            Map<String, Object> errorRoute = new HashMap<>();
-            errorRoute.put("type", "Error connecting to Routing Service");
-            errorRoute.put("eta", "--");
-            errorRoute.put("distance", "--");
-            routes.add(errorRoute);
+            routes.add(createErrorRoute("Error connecting to Routing Service"));
         }
 
         response.put("start", start);
@@ -109,5 +111,25 @@ public class RouteService {
         response.put("routes", routes);
 
         return response;
+    }
+
+    private Map<String, Object> createRouteMap(String type, double durationSec, double distanceMeters, String traffic,
+            String color, String geometry) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("type", type);
+        map.put("eta", (int) (durationSec / 60) + " mins");
+        map.put("distance", (Math.round((distanceMeters / 1000.0) * 10.0) / 10.0) + " km");
+        map.put("trafficCondition", traffic);
+        map.put("color", color);
+        map.put("encodedPath", geometry);
+        return map;
+    }
+
+    private Map<String, Object> createErrorRoute(String msg) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("type", msg);
+        map.put("eta", "--");
+        map.put("distance", "--");
+        return map;
     }
 }

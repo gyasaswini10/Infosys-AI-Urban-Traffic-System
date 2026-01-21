@@ -68,6 +68,17 @@ export default class RouteOptimization extends Component {
         return poly;
     }
 
+    jitterPath(path, index) {
+        // Leave the first route (Best) as is
+        if (index === 0 || !path) return path;
+
+        // Offset subsequent routes significantly to be visible as separate lines
+        // 0.02 degrees is roughly 2km, creating a very distinct separation
+        const offset = index === 1 ? 0.02 : -0.02;
+
+        return path.map(pt => [pt[0] + offset, pt[1] + offset]);
+    }
+
     handleOptimize() {
         const { start, end } = this.state;
         if (!start || !end) {
@@ -163,14 +174,30 @@ export default class RouteOptimization extends Component {
                                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                                 />
 
+                                {routes.map((route, idx) => {
+                                    // Jitter path if it's not the selected one or just to show separation
+                                    // For visuals, we offset indices 1 and 2 slightly if they are duplicates
+                                    const isSelected = selectedRoute === route;
+                                    const displayPath = this.jitterPath(route.decodedPath, idx);
+
+                                    return (
+                                        <Polyline
+                                            key={idx}
+                                            positions={displayPath}
+                                            color={route.color}
+                                            opacity={isSelected ? 1 : 0.6}
+                                            weight={isSelected ? 7 : 5}
+                                            eventHandlers={{ click: () => this.setState({ selectedRoute: route }) }}
+                                        />
+                                    );
+                                })}
+
                                 {selectedRoute && selectedRoute.decodedPath && selectedRoute.decodedPath.length > 0 && (
                                     <>
+                                        {/* Center View on Selected Route */}
                                         <ChangeView bounds={selectedRoute.decodedPath} />
-                                        <Polyline
-                                            positions={selectedRoute.decodedPath}
-                                            color={selectedRoute.color}
-                                            weight={6}
-                                        />
+
+                                        {/* Markers for Start/End */}
                                         <Marker position={selectedRoute.decodedPath[0]}>
                                             <Popup>Start</Popup>
                                         </Marker>

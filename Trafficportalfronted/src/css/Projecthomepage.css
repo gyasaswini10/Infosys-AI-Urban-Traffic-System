@@ -1,437 +1,320 @@
-/* Modern Color Palette - Light Theme */
+/* Site123 Deep Blue Theme Replica */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
+
 :root {
-  --primary-color: #ffffff;
-  /* White background */
-  --secondary-color: #f4f6f8;
-  /* Very light grey for contrast sections */
-  --accent-color: #008080;
-  /* Teal */
-  --accent-glow: rgba(0, 128, 128, 0.2);
-  --text-main: #333333;
-  /* Dark Grey for body text */
-  --text-header: #000000;
-  /* Black for headers */
-  --success-color: #2ea043;
-  --error-color: #d32f2f;
-  --glass-bg: rgba(255, 255, 255, 0.9);
-  --glass-border: 1px solid rgba(0, 0, 0, 0.1);
-  --shadow-light: 0 4px 6px rgba(0, 0, 0, 0.05);
-  /* Soft shadow */
+  --primary-blue: #225e76; /* The specific teal-blue from screenshots */
+  --dark-blue: #1a4a5e; /* Darker shade for footer/contrast */
+  --accent-cyan: #225e76; /* Same as primary for consistency or slightly lighter */
+  --text-white: #ffffff;
+  --text-dark: #333333;
+  --bg-light: #f5f5f5;
+  --overlay-bg: rgba(34, 94, 118, 0.9); /* Blue overlay */
 }
 
 body {
-  background-color: var(--primary-color);
-  color: var(--text-main);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-}
-
-/* Container */
-.homepage-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    color: var(--text-dark);
+    background-color: var(--text-white);
+    overflow-x: hidden;
+    /* Ensure modal overlays cover everything */
+    position: relative; 
 }
 
 /* Navbar */
 .navbar {
-  display: flex;
-  justify-content: scene-between;
-  /* Typo fix: space-between */
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
-  background: var(--glass-bg);
-  backdrop-filter: blur(10px);
-  position: fixed;
-  width: 100%;
-  top: 0;
-  z-index: 1000;
-  border-bottom: var(--glass-border);
-  box-shadow: var(--shadow-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 5%;
+    background-color: var(--primary-blue);
+    color: white;
+    /* Fixed position logic if needed, but sticking to flow for now */
 }
 
-.navbar-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--accent-color);
-  /* Teal brand */
+.brand-name {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
 }
 
-.logo-icon {
-  font-size: 1.8rem;
+.navbar-links {
+    display: flex;
+    gap: 20px;
 }
 
-.nav-btn-signin {
-  padding: 0.5rem 1.5rem;
-  background: transparent;
-  border: 2px solid var(--accent-color);
-  color: var(--accent-color);
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
+.nav-link {
+    color: white;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    opacity: 0.9;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+    transition: opacity 0.2s;
 }
 
-.nav-btn-signin:hover {
-  background: var(--accent-color);
-  color: #fff;
+.nav-link:hover {
+    opacity: 1;
+    text-decoration: underline;
 }
 
 /* Hero Section */
 .hero-section {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 85vh;
-  text-align: center;
-  background: radial-gradient(circle at 50% 50%, #e0f2f1 0%, var(--primary-color) 70%);
-  /* Light Teal Gradient */
-  padding: 0 20px;
-  margin-top: 60px;
-  /* Offset for fixed navbar */
+    display: flex;
+    min-height: 80vh; /* Adjust height as needed */
+    background-color: var(--primary-blue);
+    color: white;
 }
 
-.hero-content {
-  max-width: 800px;
-  animation: fadeInUp 1s ease-out;
+.hero-text {
+    flex: 1;
+    padding: 5% 5%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .hero-title {
-  font-size: 3.5rem;
-  color: var(--text-header);
-  margin-bottom: 1rem;
-  line-height: 1.2;
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 2rem;
 }
 
-.highlight-text {
-  color: var(--accent-color);
-  text-shadow: none;
-  /* Removed glow for clean light look */
-  font-weight: 800;
+.hero-title::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 4px;
+    background: #5dade2; /* Lighter blue underline */
+    margin-top: 15px;
 }
 
 .hero-subtitle {
-  font-size: 1.2rem;
-  color: var(--text-main);
-  margin-bottom: 2.5rem;
-  line-height: 1.6;
+    font-size: 1.2rem;
+    font-weight: 300;
+    max-width: 80%;
+    line-height: 1.5;
 }
 
-.hero-buttons {
-  display: flex;
-  gap: 15px;
-  justify-content: center;
+.hero-image-container {
+    flex: 1;
+    background-size: cover;
+    background-position: center;
+    /* Image will be set inline or via JS */
 }
 
-.cta-button {
-  padding: 12px 30px;
-  font-size: 1rem;
-  font-weight: 600;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  border: none;
+/* About Section (Discover) */
+.about-section {
+    position: relative;
+    padding: 0;
+    min-height: 60vh;
+    background-size: cover;
+    background-position: center;
+    /* Optional: fixed attachment for parallax feel */
+    background-attachment: fixed; 
 }
 
-.cta-button.primary {
-  background: var(--accent-color);
-  color: white;
-  box-shadow: 0 4px 15px var(--accent-glow);
+.about-overlay-card {
+    position: absolute;
+    bottom: 0;
+    right: 5%;
+    width: 400px;
+    background-color: var(--primary-blue); /* Match screenshot blue block */
+    color: white;
+    padding: 3rem;
+    /* Overlap effect */
+    transform: translateY(20%); 
 }
 
-.cta-button.primary:hover {
-  transform: translateY(-2px);
-  background: #006666;
-  /* Darker teal */
+.about-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
 }
 
-.cta-button.secondary {
-  background: white;
-  color: var(--accent-color);
-  border: 2px solid var(--accent-color);
+.about-desc {
+    font-size: 1rem;
+    line-height: 1.6;
 }
 
-.cta-button.secondary:hover {
-  background: var(--secondary-color);
+/* Testimonials */
+.testimonials-section {
+    padding: 8rem 5% 4rem 5%; /* Extra top padding to account for overlap */
+    background-color: var(--primary-blue);
+    color: white;
+    text-align: center;
 }
 
-/* Info Grid Section */
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  padding: 4rem 2rem;
-  background: var(--secondary-color);
-  justify-items: center;
-  /* Center cards horizontally in their tracks */
+.section-header {
+    margin-bottom: 3rem;
+    font-size: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
 
-.info-card {
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  border: var(--glass-border);
-  box-shadow: var(--shadow-light);
-  transition: transform 0.3s ease;
-  width: 100%;
-  max-width: 400px;
-  /* Prevent cards from becoming too wide */
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  /* Ensure consistent height if rows align */
+.testimonial-card {
+    display: flex;
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--dark-blue); /* Slightly different tone */
+    border-radius: 4px;
+    overflow: hidden;
+    text-align: left;
 }
 
-.info-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+.testi-image {
+    width: 40%;
+    background-size: cover;
+    background-position: center;
 }
 
-.card-header {
-  font-size: 1.5rem;
-  color: var(--accent-color);
-  margin-bottom: 1.5rem;
-  font-weight: 700;
-  border-bottom: 2px solid rgba(0, 128, 128, 0.1);
-  padding-bottom: 0.5rem;
+.testi-content {
+    width: 60%;
+    padding: 3rem;
+    background-color: #4daecd; /* Adjust based on screenshot cyan-blue */
 }
 
-.card-list {
-  list-style: none;
-  padding: 0;
+.testi-role {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+    opacity: 0.8;
 }
 
-.card-list li {
-  position: relative;
-  padding-left: 1.5rem;
-  margin-bottom: 0.8rem;
-  color: var(--text-main);
-  line-height: 1.5;
-  font-weight: 500;
+.testi-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
 }
 
-.card-list li::before {
-  content: "•";
-  /* Bullet point */
-  color: var(--accent-color);
-  font-weight: bold;
-  position: absolute;
-  left: 0;
-  font-size: 1.2rem;
+.testi-text {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
 }
 
-/* Footer & Slogan */
-.footer-section {
-  padding: 3rem 2rem;
-  text-align: center;
-  background: var(--primary-color);
-  border-top: var(--glass-border);
-  color: var(--text-main);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
+.stars {
+    color: #f1c40f;
+    font-size: 1.2rem;
 }
 
-.footer-slogan {
-  font-size: 1.8rem;
-  color: var(--text-header);
-  font-weight: 700;
-  letter-spacing: 0.5px;
+/* Contact Section */
+.contact-section {
+    position: relative;
+    padding: 4rem 5%;
+    background-color: white;
+    text-align: center;
 }
 
-.footer-flow {
-  font-size: 1.2rem;
-  color: var(--accent-color);
-  font-weight: 700;
-  display: flex;
-  gap: 1rem;
-  align-items: center;
+.contact-header {
+    color: var(--text-dark);
+    margin-bottom: 2rem;
 }
 
-.arrow {
-  color: var(--text-main);
-  font-weight: 400;
+.map-background-container {
+    position: relative;
+    width: 100%;
+    min-height: 600px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-/* Modal Overlay */
+.contact-form-card {
+    background: white;
+    padding: 2rem;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* layout for inputs */
+    gap: 15px;
+    text-align: left;
+}
+
+.contact-info {
+    grid-column: 1 / -1;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+}
+
+.form-input {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+.contact-btn {
+    grid-column: 1 / -1;
+    background-color: #33b5e5; /* Bright cyan button */
+    color: white;
+    border: none;
+    padding: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+/* Footer */
+.footer {
+    background-color: var(--primary-blue);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+/* Modal Overlay (Keep mostly same but style to match theme) */
 .modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-  backdrop-filter: blur(5px);
-  animation: fadeIn 0.3s ease;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 2000;
 }
-
 .modal-content {
-  background: white;
-  padding: 2.5rem;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 400px;
-  border: var(--glass-border);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
-  animation: scaleUp 0.3s ease;
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 90%; max-width: 400px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
 }
+.close-btn { float: right; cursor: pointer; font-size: 1.5rem; color: #333; }
+.modal-header h2 { color: var(--primary-blue); text-align: center; }
 
-.modal-header h2 {
-  color: var(--accent-color);
-  text-align: center;
-  margin-bottom: 1.5rem;
-}
-
-/* Form Elements */
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: var(--text-main);
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.form-group input,
-.form-group select {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 1rem;
-  background: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  color: var(--text-header);
-  font-size: 1rem;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: var(--accent-color);
-  background: white;
-}
-
-.submit-btn {
-  width: 100%;
-  padding: 12px;
-  background: var(--accent-color);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 1rem;
-  transition: background 0.3s ease;
-}
-
-.submit-btn:hover {
-  background: #006666;
-}
-
-.forgot-password {
-  text-align: right;
-  font-size: 0.85rem;
-  margin-top: -0.5rem;
-  margin-bottom: 1rem;
-}
-
-.forgot-password span,
-.switch-mode span {
-  color: var(--accent-color);
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.forgot-password span:hover,
-.switch-mode span:hover {
-  text-decoration: underline;
-}
-
-.switch-mode {
-  text-align: center;
-  margin-top: 1.5rem;
-  font-size: 0.9rem;
-  color: var(--text-main);
-}
-
-/* Success/Error Messages */
-.message-box {
-  margin-top: 1rem;
-  padding: 10px;
-  border-radius: 6px;
-  text-align: center;
-  font-size: 0.9rem;
-}
-
-.message-box.error {
-  background: #fde8e8;
-  color: var(--error-color);
-  border: 1px solid #fbc4c4;
-}
-
-.message-box.success {
-  background: #def7ec;
-  color: var(--success-color);
-  border: 1px solid #bcf0da;
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes scaleUp {
-  from {
-    transform: scale(0.9);
-    opacity: 0;
-  }
-
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
+/* Keep form styles for modal */
+.form-group label { display: block; margin-bottom: 0.5rem; color: #333; }
+.form-group input, .form-group select { width: 100%; padding: 10px; margin-bottom: 1rem; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;}
+.submit-btn { width: 100%; padding: 12px; background: var(--primary-blue); color: white; border: none; border-radius: 4px; cursor: pointer; }
+.switch-mode { text-align: center; margin-top: 1rem; font-size: 0.9rem; color: #666; }
+.switch-mode span { color: var(--primary-blue); cursor: pointer; font-weight: bold; }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .hero-title {
-    font-size: 2.5rem;
-  }
-
-  .hero-buttons {
-    flex-direction: column;
-  }
-
-  .cta-button {
-    width: 100%;
-  }
+    .hero-section { flex-direction: column; }
+    .hero-image-container { min-height: 300px; }
+    .about-overlay-card { position: relative; width: auto; transform: none; right: auto; margin: -50px 5% 0 5%; }
+    .testimonial-card { flex-direction: column; }
+    .testi-image { width: 100%; height: 200px; }
+    .testi-content { width: 100%; }
+    .contact-form-card { grid-template-columns: 1fr; }
 }

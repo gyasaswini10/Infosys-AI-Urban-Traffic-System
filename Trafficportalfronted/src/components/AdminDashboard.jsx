@@ -11,27 +11,27 @@ import Profile from './Profile';
 import { ADMIN_MENU, DRIVER_MENU } from './MenuConstants';
 import { BASEURL, callApi } from '../api';
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
 } from 'chart.js';
 import { Line, Bar } from 'react-chartjs-2';
 
 ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend
 );
 
 export default class AdminDashboard extends Component {
@@ -49,7 +49,7 @@ export default class AdminDashboard extends Component {
     }
 
     componentDidMount() {
-        if(this.state.isDriver && this.props.userid) {
+        if (this.state.isDriver && this.props.userid) {
             this.fetchDriverStats();
         } else {
             this.fetchUsers();
@@ -67,15 +67,15 @@ export default class AdminDashboard extends Component {
                 callApi("GET", BASEURL + "analytics/charts", null, (chartData) => {
                     try {
                         const charts = JSON.parse(chartData);
-                        this.setState({ 
+                        this.setState({
                             analyticsData: {
                                 overview: overview,
                                 charts: charts
                             }
                         });
-                    } catch(e) {}
+                    } catch (e) { }
                 });
-            } catch(e) {}
+            } catch (e) { }
         });
     }
 
@@ -86,7 +86,7 @@ export default class AdminDashboard extends Component {
                 // Filter posts where type is "Diversion"
                 const activeDiversions = posts.filter(p => p.type === "Diversion");
                 this.setState({ diversions: activeDiversions });
-            } catch(e) {}
+            } catch (e) { }
         });
     }
 
@@ -95,7 +95,7 @@ export default class AdminDashboard extends Component {
         callApi("GET", BASEURL + "users/all", null, (data) => {
             try {
                 this.setState({ users: JSON.parse(data) });
-            } catch(e) {
+            } catch (e) {
                 console.error("Error fetching users", e);
             }
         });
@@ -103,33 +103,33 @@ export default class AdminDashboard extends Component {
 
     editUser(email) {
         const statusStr = prompt("Update Status (0: Pending, 1: Active, 2: Rejected):", "1");
-        if(statusStr) {
+        if (statusStr) {
             const status = parseInt(statusStr);
             const payload = { email: email, status: status };
-            
+
             // Using direct fetch to ensure JSON.stringify is applied (handling potential api.js cache issues)
             fetch(BASEURL + "users/updateStatus", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             })
-            .then(res => res.text())
-            .then(resp => {
-                if(resp.includes("200")) {
-                     alert("✅ User status updated via Database!");
-                     this.fetchUsers(); 
-                } else {
-                     alert("❌ Update failed: " + resp);
-                }
-            })
-            .catch(err => alert("Error: " + err));
+                .then(res => res.text())
+                .then(resp => {
+                    if (resp.includes("200")) {
+                        alert("✅ User status updated via Database!");
+                        this.fetchUsers();
+                    } else {
+                        alert("❌ Update failed: " + resp);
+                    }
+                })
+                .catch(err => alert("Error: " + err));
         }
     }
 
     createDiversion() {
         const road = prompt("Enter Road Name:");
         const reason = prompt("Enter Reason (e.g. Construction, VIP):");
-        if(road && reason) {
+        if (road && reason) {
             const payload = {
                 title: road,
                 description: reason,
@@ -144,20 +144,20 @@ export default class AdminDashboard extends Component {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             })
-            .then(res => res.text())
-            .then(resp => {
-                if(resp.includes("200")) {
-                     alert(`🚧 New Diversion Created in Database!`);
-                     this.fetchDiversions(); // Refresh list
-                } else {
-                     alert("Failed to create diversion");
-                }
-            });
+                .then(res => res.text())
+                .then(resp => {
+                    if (resp.includes("200")) {
+                        alert(`🚧 New Diversion Created in Database!`);
+                        this.fetchDiversions(); // Refresh list
+                    } else {
+                        alert("Failed to create diversion");
+                    }
+                });
         }
     }
 
     overrideSignal(junction, action) {
-        if(confirm(`⚠️ CONFIRM: Force ${action} at ${junction}? This will override AI control.`)) {
+        if (confirm(`⚠️ CONFIRM: Force ${action} at ${junction}? This will override AI control.`)) {
             alert(`✅ signal at ${junction} is now FORCED ${action.toUpperCase()}`);
         }
     }
@@ -166,7 +166,7 @@ export default class AdminDashboard extends Component {
         callApi("GET", BASEURL + "gamification/driver/" + this.props.userid, null, (data) => {
             try {
                 this.setState({ driverStats: JSON.parse(data) });
-            } catch(e) {
+            } catch (e) {
                 console.error("Failed to parse gamification data", e);
             }
         });
@@ -193,37 +193,62 @@ export default class AdminDashboard extends Component {
                     return (
                         <div className="tab-content">
                             <h3>🚦 Traffic Control Center</h3>
-                            <div className="control-grid" style={{display:'grid', gridTemplateQuestions:'1fr 1fr', gap:'20px'}}>
+                            <div className="control-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '25px' }}>
                                 <div className="card-panel">
-                                    <h4>Active Diversions</h4>
-                                    <ul className="alert-list">
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', borderBottom: '2px solid var(--bg-light)', paddingBottom: '10px' }}>
+                                        <h4 style={{ margin: 0, border: 0 }}>Active Diversions</h4>
+                                        <button className="btn-add" style={{ fontSize: '0.85rem', padding: '8px 16px' }} onClick={() => this.createDiversion()}>+ New Diversion</button>
+                                    </div>
+
+                                    <div className="diversion-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '15px' }}>
                                         {this.state.diversions.length > 0 ? this.state.diversions.map((d, i) => (
-                                            <li key={i} className="alert-item">🚧 <strong>{d.title}</strong>: {d.description}</li>
+                                            <div key={i} className="diversion-card">
+                                                <div className="div-header">
+                                                    <span className="icon">🚧</span>
+                                                    <span className="title">{d.title}</span>
+                                                    <span className="badge-severity high">High</span>
+                                                </div>
+                                                <div className="div-body">
+                                                    <label>Reason</label>
+                                                    <p>{d.description}</p>
+                                                </div>
+                                                <div className="div-footer">
+                                                    <small>Location: {d.location || d.title}</small>
+                                                </div>
+                                            </div>
                                         )) : (
-                                            <li className="alert-item">No active diversions found in DB.</li>
+                                            <div className="empty-state">
+                                                <p>No active diversions. Traffic flowing normally.</p>
+                                            </div>
                                         )}
-                                    </ul>
-                                    <button className="btn-add" style={{marginTop:'10px'}} onClick={() => this.createDiversion()}>+ Create New Diversion</button>
+                                    </div>
                                 </div>
+
                                 <div className="card-panel">
                                     <h4>Signal Priority Override</h4>
                                     <div className="signal-control">
-                                        <label>Jubilee Checkpost</label>
-                                        <div className="signal-lights">
-                                            <span className="light red active"></span>
-                                            <span className="light yellow"></span>
-                                            <span className="light green"></span>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <label>Jubilee Checkpost</label>
+                                            <div className="signal-lights">
+                                                <span className="light red active"></span>
+                                                <span className="light yellow"></span>
+                                                <span className="light green"></span>
+                                            </div>
                                         </div>
-                                        <button className="btn-approve" onClick={() => this.overrideSignal('Jubilee Checkpost', 'Green')}>Force Green (Emergency)</button>
+                                        <p style={{ fontSize: '0.85rem', color: '#666', margin: '5px 0 10px 0' }}>Current Mode: <strong>Emergency Block</strong></p>
+                                        <button className="btn-approve" style={{ width: '100%' }} onClick={() => this.overrideSignal('Jubilee Checkpost', 'Green')}>Force Green (Clear)</button>
                                     </div>
-                                    <div className="signal-control" style={{marginTop:'10px'}}>
-                                        <label>KBR Park Junction</label>
-                                        <div className="signal-lights">
-                                            <span className="light red"></span>
-                                            <span className="light yellow"></span>
-                                            <span className="light green active"></span>
+                                    <div className="signal-control" style={{ marginTop: '15px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <label>KBR Park Junction</label>
+                                            <div className="signal-lights">
+                                                <span className="light red"></span>
+                                                <span className="light yellow"></span>
+                                                <span className="light green active"></span>
+                                            </div>
                                         </div>
-                                        <button className="btn-approve" style={{background:'#dc3545'}} onClick={() => this.overrideSignal('KBR Park Junction', 'Red')}>Force Red (Block)</button>
+                                        <p style={{ fontSize: '0.85rem', color: '#666', margin: '5px 0 10px 0' }}>Current Mode: <strong>Normal Flow</strong></p>
+                                        <button className="btn-approve" style={{ background: '#dc3545', width: '100%' }} onClick={() => this.overrideSignal('KBR Park Junction', 'Red')}>Force Red (Stop)</button>
                                     </div>
                                 </div>
                             </div>
@@ -254,32 +279,32 @@ export default class AdminDashboard extends Component {
                     return (
                         <div className="tab-content">
                             <h3>📊 Smart City Analytics</h3>
-                            <div className="analytics-summary" style={{display:'flex', gap:'20px', marginBottom:'20px'}}>
-                                <div className="stat-card" style={{borderLeft:'5px solid #3b82f6', background:'white', padding:'15px', borderRadius:'8px', boxShadow:'0 2px 4px rgba(0,0,0,0.1)', flex:1}}>
-                                    <div style={{fontSize:'0.9rem', color:'#666'}}>Total Fleet</div>
-                                    <div style={{fontSize:'1.8rem', fontWeight:'bold'}}>{this.state.analyticsData ? this.state.analyticsData.overview.totalFleet : '...'}</div>
+                            <div className="analytics-summary" style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
+                                <div className="stat-card" style={{ borderLeft: '5px solid #3b82f6', background: 'white', padding: '15px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', flex: 1 }}>
+                                    <div style={{ fontSize: '0.9rem', color: '#666' }}>Total Fleet</div>
+                                    <div style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>{this.state.analyticsData ? this.state.analyticsData.overview.totalFleet : '...'}</div>
                                 </div>
-                                <div className="stat-card" style={{borderLeft:'5px solid #10b981', background:'white', padding:'15px', borderRadius:'8px', boxShadow:'0 2px 4px rgba(0,0,0,0.1)', flex:1}}>
-                                    <div style={{fontSize:'0.9rem', color:'#666'}}>Active Routes</div>
-                                    <div style={{fontSize:'1.8rem', fontWeight:'bold'}}>{this.state.analyticsData ? this.state.analyticsData.overview.activeRoutes : '...'}</div>
+                                <div className="stat-card" style={{ borderLeft: '5px solid #10b981', background: 'white', padding: '15px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', flex: 1 }}>
+                                    <div style={{ fontSize: '0.9rem', color: '#666' }}>Active Routes</div>
+                                    <div style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>{this.state.analyticsData ? this.state.analyticsData.overview.activeRoutes : '...'}</div>
                                 </div>
-                                <div className="stat-card" style={{borderLeft:'5px solid #f59e0b', background:'white', padding:'15px', borderRadius:'8px', boxShadow:'0 2px 4px rgba(0,0,0,0.1)', flex:1}}>
-                                    <div style={{fontSize:'0.9rem', color:'#666'}}>Trips Today</div>
-                                    <div style={{fontSize:'1.8rem', fontWeight:'bold'}}>{this.state.analyticsData ? this.state.analyticsData.overview.tripsToday : '...'}</div>
+                                <div className="stat-card" style={{ borderLeft: '5px solid #f59e0b', background: 'white', padding: '15px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', flex: 1 }}>
+                                    <div style={{ fontSize: '0.9rem', color: '#666' }}>Trips Today</div>
+                                    <div style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>{this.state.analyticsData ? this.state.analyticsData.overview.tripsToday : '...'}</div>
                                 </div>
                             </div>
-                            
-                            <div className="analytics-extra" style={{marginTop:'20px', display:'grid', gridTemplateColumns:'1fr 1fr', gap:'20px'}}>
+
+                            <div className="analytics-extra" style={{ marginTop: '20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                                 <div className="card-panel">
                                     <h4>Congestion Trends (Today)</h4>
-                                    <div style={{height:'300px', padding:'10px'}}>
-                                        {this.state.analyticsData ? <Line options={{responsive:true, maintainAspectRatio:false}} data={congestionData} /> : 'Loading Chart...'}
+                                    <div style={{ height: '300px', padding: '10px' }}>
+                                        {this.state.analyticsData ? <Line options={{ responsive: true, maintainAspectRatio: false }} data={congestionData} /> : 'Loading Chart...'}
                                     </div>
                                 </div>
                                 <div className="card-panel">
                                     <h4>Emissions Analysis (Weekly)</h4>
-                                    <div style={{height:'300px', padding:'10px'}}>
-                                        {this.state.analyticsData ? <Bar options={{responsive:true, maintainAspectRatio:false}} data={emissionData} /> : 'Loading Chart...'}
+                                    <div style={{ height: '300px', padding: '10px' }}>
+                                        {this.state.analyticsData ? <Bar options={{ responsive: true, maintainAspectRatio: false }} data={emissionData} /> : 'Loading Chart...'}
                                     </div>
                                 </div>
                             </div>
@@ -293,10 +318,10 @@ export default class AdminDashboard extends Component {
                     return <TrafficPosting />;
                 case 'user_management':
                     return (
-                         <div className="tab-content">
+                        <div className="tab-content">
                             <h3>👥 User & Role Management</h3>
                             <p>Manage access for Admins, Managers, and Drivers.</p>
-                             <table className="dashboard-table">
+                            <table className="dashboard-table">
                                 <thead>
                                     <tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Action</th></tr>
                                 </thead>
@@ -318,21 +343,21 @@ export default class AdminDashboard extends Component {
                                     )}
                                 </tbody>
                             </table>
-                         </div>
+                        </div>
                     );
                 case 'profile':
                     return <Profile />;
                 default:
                     return <TrafficDashboard />;
             }
-        } 
-        
+        }
+
         // --- DRIVER VIEWS ---
         else {
             switch (activeView) {
                 // ... (existing cases)
                 case 'ev_charging':
-                     return (
+                    return (
                         <div className="tab-content">
                             <h3>⚡ EV Charging Guidance</h3>
                             <div className="card-panel">
@@ -341,10 +366,10 @@ export default class AdminDashboard extends Component {
                                     <li className="alert-item ok">🔋 <strong>Station A (2km)</strong>: 4 Fast Chargers (Available)</li>
                                     <li className="alert-item warning">🔋 <strong>Station B (5km)</strong>: 2 Chargers (Wait time: 10m)</li>
                                 </ul>
-                                <button className="btn-primary" style={{marginTop:'15px'}}>Navigate to Nearest Charger</button>
+                                <button className="btn-primary" style={{ marginTop: '15px' }}>Navigate to Nearest Charger</button>
                             </div>
                         </div>
-                     );
+                    );
                 case 'my_routes':
                     return (
                         <div className="tab-content">
@@ -358,8 +383,8 @@ export default class AdminDashboard extends Component {
                                     <h4>Logistics Hub A &rarr; City Center Zone 4</h4>
                                     <p>Cargo: Medical Supplies</p>
                                     <p>Cargo: Medical Supplies</p>
-                                    <div className="progress-bar"><div style={{width:'40%'}}></div></div>
-                                    <button className="btn-primary" style={{width:'100%', marginTop:'10px'}} onClick={() => this.setState({activeView: 'navigation'})}>Start Navigation</button>
+                                    <div className="progress-bar"><div style={{ width: '40%' }}></div></div>
+                                    <button className="btn-primary" style={{ width: '100%', marginTop: '10px' }} onClick={() => this.setState({ activeView: 'navigation' })}>Start Navigation</button>
                                 </div>
                                 <div className="route-card">
                                     <div className="route-header">
@@ -368,7 +393,7 @@ export default class AdminDashboard extends Component {
                                     </div>
                                     <h4>City Center &rarr; Warehouse B</h4>
                                     <p>Cargo: General Goods</p>
-                                    <button className="btn-secondary" style={{width:'100%', marginTop:'10px'}} onClick={() => alert("Route Details\n\nFrom: City Center\nTo: Warehouse B\nCargo: General Goods\nPickup Time: 14:00\n\nStatus: Scheduled")}>View Details</button>
+                                    <button className="btn-secondary" style={{ width: '100%', marginTop: '10px' }} onClick={() => alert("Route Details\n\nFrom: City Center\nTo: Warehouse B\nCargo: General Goods\nPickup Time: 14:00\n\nStatus: Scheduled")}>View Details</button>
                                 </div>
                             </div>
                         </div>
@@ -380,10 +405,10 @@ export default class AdminDashboard extends Component {
                 case 'vehicle_health':
                     return <Maintenance role={role} userid={userid} />; // Reusing Maintenance for health
                 case 'incentives':
-                     const { driverStats } = this.state;
-                     if(!driverStats) return <div>Loading Rewards...</div>;
-                     
-                     return (
+                    const { driverStats } = this.state;
+                    if (!driverStats) return <div>Loading Rewards...</div>;
+
+                    return (
                         <div className="tab-content">
                             <h3>🏆 Driver Incentives & Rewards</h3>
                             <div className="stats-container">
@@ -425,13 +450,13 @@ export default class AdminDashboard extends Component {
         const { userid } = this.props;
 
         return (
-            <div className="dashboard-layout" style={{display:'flex', height:'100vh', overflow:'hidden'}}>
-                <div className="sidebar-container" style={{width:'260px', flexShrink:0, borderRight:'1px solid #ddd'}}>
+            <div className="dashboard-layout" style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+                <div className="sidebar-container" style={{ width: '260px', flexShrink: 0, borderRight: '1px solid #ddd' }}>
                     <MenuBar manualMenus={menuList} onMenuClick={this.handleMenuClick} />
                 </div>
-                <div className="main-content" style={{flexGrow:1, display:'flex', flexDirection:'column', overflow:'hidden'}}>
+                <div className="main-content" style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                     <Header title={this.state.isDriver ? "Driver Dashboard" : "NeuroFleetX Admin"} user={userid} />
-                    <div className="content-scrollable" style={{flexGrow:1, overflowY:'auto', padding:'25px', background:'#f8f9fa'}}>
+                    <div className="content-scrollable" style={{ flexGrow: 1, overflowY: 'auto', padding: '25px', background: '#f8f9fa' }}>
                         {this.renderContent()}
                     </div>
                 </div>

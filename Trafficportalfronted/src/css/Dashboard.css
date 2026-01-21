@@ -1,43 +1,63 @@
-.dashboard{
+.dashboard {
   width: 100%;
   height: 100%;
-  background: whitesmoke;
+  background: var(--bg-light);
   display: grid;
   grid-template-rows: 50px auto;
-  grid-template-columns: 200px auto;
-  gap: 1px;
+  grid-template-columns: 240px auto;
+  /* Slightly wider sidebar */
+  gap: 0;
 }
-.dashboard .headerr{
-  
-  background-color: #519755;
+
+.dashboard .headerr {
+
+  background-color: var(--primary-blue);
+  color: white;
+  /* White text for contrast */
   grid-column: 1 / span 2;
-  border-bottom: 1px solid rgb(0,0,0,0.1);
+  border-bottom: 3px solid var(--accent-cyan);
+  /* Accent Border */
+  display: flex;
+  /* Flex to align items */
+  align-items: center;
+  padding: 0 15px;
 }
-.dashboard .menu{
-  background-color: rgb(231, 236, 179);
-  border-radius: 1px solid rgb(0,0,0,0.1);
+
+.dashboard .menu {
+  background-color: var(--primary-blue);
+  /* Matches menu bar match */
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
-.dashboard .outlet{
-  background-color: #A8DCAB
+
+.dashboard .outlet {
+  background-color: var(--bg-light);
+  padding: 20px;
+  /* Add breathing room for content */
 }
-.headerr .logo{
-  width: 70px;
-  float: left;
-  margin-top: 5px;
-  margin-left: 10px;
-}
-.headerr .logout{
-  width: 24px;
-  float: right;
-  margin-top: 12px;
+
+.headerr .logo {
+  width: 40px;
+  /* Adjusted size */
   margin-right: 10px;
 }
-.headerr .logout:hover{
-  cursor: pointer;
+
+.headerr label {
+  font-weight: 700;
+  font-size: 1.2rem;
+  letter-spacing: 0.5px;
+  flex: 1;
+  /* Pushes logout to right */
 }
-.headerr label{
-  font-weight: bold;
-  float: right;
-  margin-right: 20px;
-  margin-top: 15px;
+
+.headerr .logout {
+  width: 24px;
+  filter: brightness(0) invert(1);
+  /* Make icons white */
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.headerr .logout:hover {
+  opacity: 1;
 }
