@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import '../css/Projecthomepage.css';
 import '../css/Auth.css'; // New styles
 import { BASEURL, callApi, setSession } from '../api';
-
+import trafficHomeBg from '../assets/traffic_home_page.png';
+import aboutBg from '../assets/about_section_bg.png';
+import trafficHomeBg1 from '../assets/trafficpage1.jpg';
 const Projecthomepage = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('login'); // 'login' or 'signup'
@@ -150,13 +152,12 @@ const Projecthomepage = () => {
           <h1 className="hero-title">Welcome to<br />TrafficPortal</h1>
           <p className="hero-subtitle">Transforming Your Traffic Experience for Smarter Cities</p>
         </div>
-        <div className="hero-image-container" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1578575437130-527eed3abbec?q=80&w=2070&auto=format&fit=crop')" }}>
-          {/* Using a high quality Unsplash image of a port/logistics hub similar to screenshot */}
+        <div className="hero-image-container" style={{ backgroundImage: `url(${trafficHomeBg})` }}>
         </div>
       </header>
 
       {/* About / Discover Section */}
-      <section id="about" className="about-section" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1473186505569-9c61870c11f9?q=80&w=2070&auto=format&fit=crop')" }}>
+      <section id="about" className="about-section" style={{ backgroundImage: `url(${trafficHomeBg1})` }}>
         <div className="about-overlay-card">
           <h2 className="about-title">Discover TrafficPortal</h2>
           <p className="about-desc">
