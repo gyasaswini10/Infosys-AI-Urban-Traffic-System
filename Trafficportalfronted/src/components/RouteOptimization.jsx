@@ -1,6 +1,26 @@
 import React, { Component } from 'react';
 import '../css/RouteOptimization.css';
 import { BASEURL, callApi } from '../api';
+import { MapContainer, TileLayer, Polyline, Marker, Popup, useMap } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+
+// Fix for default marker icon in React Leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+// Component to update map view when route changes
+function ChangeView({ bounds }) {
+    const map = useMap();
+    if (bounds && bounds.length > 0) {
+        map.fitBounds(bounds, { padding: [50, 50] });
+    }
+    return null;
+}
 
 export default class RouteOptimization extends Component {
     constructor(props) {
@@ -15,6 +35,39 @@ export default class RouteOptimization extends Component {
         this.handleOptimize = this.handleOptimize.bind(this);
     }
 
+    // Helper to decode Google Polyline
+    decodePolyline(encoded) {
+        if (!encoded) return [];
+        var poly = [];
+        var index = 0, len = encoded.length;
+        var lat = 0, lng = 0;
+
+        while (index < len) {
+            var b, shift = 0, result = 0;
+            do {
+                b = encoded.charCodeAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            var dlat = ((result & 1) !== 0 ? ~(result >> 1) : (result >> 1));
+            lat += dlat;
+
+            shift = 0;
+            result = 0;
+            do {
+                b = encoded.charCodeAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            var dlng = ((result & 1) !== 0 ? ~(result >> 1) : (result >> 1));
+            lng += dlng;
+
+            var p = [lat / 1e5, lng / 1e5];
+            poly.push(p);
+        }
+        return poly;
+    }
+
     handleOptimize() {
         const { start, end } = this.state;
         if (!start || !end) {
@@ -23,44 +76,26 @@ export default class RouteOptimization extends Component {
         }
 
         this.setState({ loading: true });
-        // Simulating logic because we are mocking the map interaction
-        // In a real scenario, we would use geocoding. 
-        // Here we just fetch the mock routes from backend which returns predefined data
+
         callApi("GET", `${BASEURL}route/optimize?start=${start}&end=${end}`, null, (res) => {
-            const data = JSON.parse(res);
-            // Simulate adding "coordinates" for SVG drawing since backend mocked simple JSON
-            // We will inject randomized SVG paths for visualization
-            const enhancedRoutes = data.routes.map((r, index) => ({
-                ...r,
-                // Mock SVG paths M startX startY Q controlX controlY endX endY
-                // We generate slight variations
-                path: this.generateMockPath(index) 
-            }));
-            
-            this.setState({ 
-                routes: enhancedRoutes, 
-                selectedRoute: enhancedRoutes[0], // Auto-select fastest
-                loading: false 
-            });
+            try {
+                const data = JSON.parse(res);
+                const enhancedRoutes = data.routes.map((r, index) => ({
+                    ...r,
+                    decodedPath: this.decodePolyline(r.encodedPath)
+                }));
+
+                this.setState({
+                    routes: enhancedRoutes,
+                    selectedRoute: enhancedRoutes[0],
+                    loading: false
+                });
+            } catch (e) {
+                console.error("Error parsing response", e);
+                this.setState({ loading: false });
+                alert("Failed to calculate routes. Please try again.");
+            }
         });
-    }
-    
-    generateMockPath(index) {
-        // Generating mock SVG paths to visualize 3 different routes on a static canvas
-        // Start roughly at 100,100 (Top Left) -> End roughly at 600,400 (Bottom Right)
-        const startX = 100, startY = 100;
-        const endX = 600, endY = 400;
-        
-        switch(index) {
-            case 0: // Fastest (Green) - Direct with slight curve
-                return `M ${startX} ${startY} Q ${350} ${150} ${endX} ${endY}`;
-            case 1: // Eco (Blue) - Looping path
-                return `M ${startX} ${startY} Q ${150} ${350} ${300} ${300} T ${endX} ${endY}`;
-            case 2: // Balanced (Orange) - Middle path
-                return `M ${startX} ${startY} Q ${450} ${200} ${endX} ${endY}`;
-            default:
-                return `M ${startX} ${startY} L ${endX} ${endY}`;
-        }
     }
 
     render() {
@@ -70,46 +105,46 @@ export default class RouteOptimization extends Component {
             <div className="route-optimization">
                 <h2>AI Route Optimizer</h2>
                 <div className="route-container">
-                    
+
                     {/* Sidebar Input & Cards */}
                     <div className="route-sidebar">
                         <div className="route-input-group">
                             <label>Start Location</label>
-                            <input 
-                                type="text" 
-                                placeholder="e.g. Warehouse A" 
+                            <input
+                                type="text"
+                                placeholder="e.g. New York, NY"
                                 value={start}
-                                onChange={(e) => this.setState({start: e.target.value})}
+                                onChange={(e) => this.setState({ start: e.target.value })}
                             />
                         </div>
                         <div className="route-input-group">
                             <label>Destination</label>
-                            <input 
-                                type="text" 
-                                placeholder="e.g. City Center Zone 4" 
+                            <input
+                                type="text"
+                                placeholder="e.g. Boston, MA"
                                 value={end}
-                                onChange={(e) => this.setState({end: e.target.value})}
+                                onChange={(e) => this.setState({ end: e.target.value })}
                             />
                         </div>
                         <button className="btn-optimize" onClick={this.handleOptimize}>
                             {loading ? 'Calculating AI Routes...' : 'Optimize Route'}
                         </button>
-                        
+
                         {/* ETA Cards */}
                         <div className="route-cards-container">
                             {routes.map((route, idx) => (
-                                <div 
-                                    key={idx} 
+                                <div
+                                    key={idx}
                                     className={`eta-card ${selectedRoute === route ? 'selected' : ''}`}
-                                    onClick={() => this.setState({selectedRoute: route})}
-                                    style={{borderLeft: `5px solid ${route.color}`}}
+                                    onClick={() => this.setState({ selectedRoute: route })}
+                                    style={{ borderLeft: `5px solid ${route.color}` }}
                                 >
                                     <div className="eta-header">
-                                        <span className="eta-type" style={{color: route.color}}>{route.type}</span>
+                                        <span className="eta-type" style={{ color: route.color }}>{route.type}</span>
                                         <span className="traffic-badge">{route.trafficCondition} Traffic</span>
                                     </div>
-                                    <div className="eta-time">{route.eta} <span style={{fontSize:'0.8rem', fontWeight:'normal'}}>({route.distance})</span></div>
-                                    {route.co2 && <div style={{fontSize:'0.8rem', color:'#6b7280', marginTop:'5px'}}>🌱 CO2 Impact: {route.co2}</div>}
+                                    <div className="eta-time">{route.eta} <span style={{ fontSize: '0.8rem', fontWeight: 'normal' }}>({route.distance})</span></div>
+                                    {route.co2 && <div style={{ fontSize: '0.8rem', color: '#6b7280', marginTop: '5px' }}>🌱 CO2 Impact: {route.co2}</div>}
                                 </div>
                             ))}
                         </div>
@@ -117,63 +152,34 @@ export default class RouteOptimization extends Component {
 
                     {/* Map Visualization */}
                     <div className="map-visualization">
-                        <div className="map-canvas">
-                            {/* SVG Layer */}
-                            <svg width="100%" height="100%" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet">
-                                <defs>
-                                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-                                        <polygon points="0 0, 10 3.5, 0 7" fill="#6b7280" />
-                                    </marker>
-                                </defs>
-                                
-                                {/* Background Grid/Features (Abstract Map) */}
-                                <rect x="50" y="50" width="700" height="500" fill="none" stroke="#cbd5e1" strokeWidth="2" rx="20"/>
-                                <path d="M200 50 V550" stroke="#cbd5e1" strokeWidth="1" strokeDasharray="5,5" />
-                                <path d="M400 50 V550" stroke="#cbd5e1" strokeWidth="1" strokeDasharray="5,5" />
-                                <path d="M600 50 V550" stroke="#cbd5e1" strokeWidth="1" strokeDasharray="5,5" />
-                                <path d="M50 200 H750" stroke="#cbd5e1" strokeWidth="1" strokeDasharray="5,5" />
-                                <path d="M50 400 H750" stroke="#cbd5e1" strokeWidth="1" strokeDasharray="5,5" />
-                                
-                                {/* Start Marker */}
-                                <circle cx="100" cy="100" r="8" className="location-marker" />
-                                <text x="100" y="80" textAnchor="middle" fill="#374151" fontSize="12" fontWeight="bold">START</text>
-                                
-                                {/* End Marker */}
-                                <circle cx="600" cy="400" r="8" className="location-marker" fill="#16a34a"/>
-                                <text x="600" y="430" textAnchor="middle" fill="#374151" fontSize="12" fontWeight="bold">DESTINATION</text>
+                        <div className="map-canvas" style={{ height: '100%', width: '100%' }}>
+                            <MapContainer
+                                center={[37.7749, -122.4194]}
+                                zoom={10}
+                                style={{ height: '100%', width: '100%' }}
+                            >
+                                <TileLayer
+                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                                />
 
-                                {/* Routes */}
-                                {routes.map((route, idx) => (
-                                    <path 
-                                        key={idx}
-                                        d={route.path}
-                                        stroke={route.color}
-                                        strokeOpacity={selectedRoute === route ? 1 : 0.3}
-                                        strokeWidth={selectedRoute === route ? 6 : 4}
-                                        fill="none"
-                                        className="route-path"
-                                        onClick={() => this.setState({selectedRoute: route})}
-                                    />
-                                ))}
-
-                            </svg>
-                            
-                            {/* Overlay Info (Interactive) */}
-                            {selectedRoute && (
-                                <div style={{
-                                    position: 'absolute', 
-                                    bottom: '20px', 
-                                    right: '20px', 
-                                    background: 'rgba(255,255,255,0.9)', 
-                                    padding: '10px', 
-                                    borderRadius: '8px',
-                                    boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-                                    fontSize: '0.9rem'
-                                }}>
-                                    <strong>Selected: {selectedRoute.type}</strong><br/>
-                                    ETA: {selectedRoute.eta}
-                                </div>
-                            )}
+                                {selectedRoute && selectedRoute.decodedPath && selectedRoute.decodedPath.length > 0 && (
+                                    <>
+                                        <ChangeView bounds={selectedRoute.decodedPath} />
+                                        <Polyline
+                                            positions={selectedRoute.decodedPath}
+                                            color={selectedRoute.color}
+                                            weight={6}
+                                        />
+                                        <Marker position={selectedRoute.decodedPath[0]}>
+                                            <Popup>Start</Popup>
+                                        </Marker>
+                                        <Marker position={selectedRoute.decodedPath[selectedRoute.decodedPath.length - 1]}>
+                                            <Popup>End</Popup>
+                                        </Marker>
+                                    </>
+                                )}
+                            </MapContainer>
                         </div>
                     </div>
 
