@@ -5,6 +5,7 @@ import { BASEURL, callApi, setSession } from '../api';
 import trafficHomeBg from '../assets/traffic_home_page.png';
 import aboutBg from '../assets/about_section_bg.png';
 import trafficHomeBg1 from '../assets/trafficpage1.jpg';
+import Contact from './Contact';
 const Projecthomepage = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('login'); // 'login' or 'signup'
@@ -188,28 +189,7 @@ const Projecthomepage = () => {
 
       {/* Contact Section */}
       <section id="contact" className="contact-section">
-        <h2 className="contact-header">CONTACT</h2>
-
-        <div className="map-background-container" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=1774&auto=format&fit=crop')" }}>
-          <div className="contact-form-card">
-            <div className="contact-info">
-              <div>
-                <strong>Address</strong><br />
-                Manhattan, New York, NY, United States
-              </div>
-              <div>
-                <strong>Mon-Fri:</strong> 08:00-19:00
-              </div>
-            </div>
-
-            <input type="text" className="form-input" placeholder="Name" />
-            <input type="text" className="form-input" placeholder="Phone" />
-            <input type="email" className="form-input full-width" placeholder="Email address" />
-            <textarea className="form-input full-width" rows="4" placeholder="Message"></textarea>
-
-            <button className="contact-btn">Contact Us</button>
-          </div>
-        </div>
+        <Contact />
       </section>
 
       {/* Footer */}
