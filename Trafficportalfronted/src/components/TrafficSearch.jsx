@@ -1,105 +1,122 @@
-import React, { Component } from 'react'
-import '/src/css/JobPosting.css'; // Reusing CSS for consistent cards
+import React, { Component } from 'react';
+import '/src/css/JobPosting.css';
+import '/src/css/TrafficSearch.css';
 import { BASEURL, callApi } from '../api';
+
+function isHyderabadRelated(location, title) {
+    const s = [location, title].filter(Boolean).join(' ').toLowerCase();
+    return /hyd|hyderabad|secunderabad|sec'bad/i.test(s);
+}
 
 export class TrafficSearch extends Component {
     constructor() {
         super();
         this.state = {
             searchKey: '',
-            results: []
+            results: [],
+            hyderabadOnly: true
         };
         this.handleSearch = this.handleSearch.bind(this);
         this.updateResults = this.updateResults.bind(this);
     }
 
     handleSearch() {
-        if(this.state.searchKey === "") {
-            alert("Please enter a location to search");
+        if (this.state.searchKey.trim() === '') {
+            alert('Please enter a location to search');
             return;
         }
-        callApi("GET", BASEURL + "traffic/search/" + this.state.searchKey, "", this.updateResults);
+        callApi('GET', BASEURL + 'traffic/search/' + encodeURIComponent(this.state.searchKey.trim()), null, this.updateResults);
     }
 
     updateResults(response) {
-        if(response.includes("404::")) {
-            this.setState({results: []});
+        if (typeof response === 'string' && response.includes('404::')) {
+            this.setState({ results: [] });
             return;
         }
         try {
-            let data = JSON.parse(response);
-            this.setState({ results: data });
-        } catch(e) {
+            const data = typeof response === 'string' ? JSON.parse(response) : response;
+            this.setState({ results: Array.isArray(data) ? data : [] });
+        } catch (e) {
             console.error(e);
+            this.setState({ results: [] });
         }
     }
 
+    loadAll = () => {
+        this.setState({ searchKey: '' });
+        callApi('GET', BASEURL + 'traffic/read', null, this.updateResults);
+    };
+
     render() {
+        const { results, hyderabadOnly, searchKey } = this.state;
+        const filtered = hyderabadOnly
+            ? results.filter((r) => isHyderabadRelated(r.location, r.title))
+            : results;
+
         return (
-            <div className='jpcontainer'>
-                <div className='header'>
-                    <label>Traffic Incident Search</label>
-                </div>
-                
-                <div className='searchBar' style={{display:'flex', gap:'10px', padding:'20px', justifyContent:'center'}}>
-                    <input 
-                        type='text' 
-                        className='searchText' 
-                        placeholder='Search by Location (e.g. Main St)' 
-                        value={this.state.searchKey}
-                        onChange={(e) => this.setState({searchKey: e.target.value})}
-                        style={{padding:'10px', width:'300px', borderRadius:'5px', border:'1px solid #ddd'}}
+            <div className="jpcontainer incident-search">
+                <div className="searchBar">
+                    <input
+                        type="text"
+                        className="searchText"
+                        placeholder="Search by location (e.g. Hyderabad, Secunderabad, Main St)"
+                        value={searchKey}
+                        onChange={(e) => this.setState({ searchKey: e.target.value })}
                     />
-                    <button 
-                        className='searchButton' 
-                        onClick={this.handleSearch}
-                        style={{padding:'10px 20px', background:'#4a90e2', color:'white', border:'none', borderRadius:'5px', cursor:'pointer'}}
-                    >
+                    <button className="searchButton" onClick={this.handleSearch}>
                         Search
                     </button>
-                    <button 
-                         onClick={() => {this.setState({searchKey:''}); callApi("GET", BASEURL + "traffic/read", "", this.updateResults)}}
-                         style={{padding:'10px 20px', background:'#6c757d', color:'white', border:'none', borderRadius:'5px', cursor:'pointer'}}
-                    >
+                    <button className="showAllButton" onClick={this.loadAll}>
                         Show All
                     </button>
+                    <label className="hyderabad-toggle">
+                        <input
+                            type="checkbox"
+                            checked={hyderabadOnly}
+                            onChange={(e) => this.setState({ hyderabadOnly: e.target.checked })}
+                        />
+                        <span>Hyderabad only</span>
+                    </label>
                 </div>
 
-                <div className='content'>
-                    {this.state.results.length === 0 ? <p style={{textAlign:'center', color:'#666'}}>No incidents found in this area.</p> : null}
-                    {this.state.results.map((data) => (
-                        <div className='result' key={data.id}>
-                            <div className='div1' style={{flexDirection:'column', alignItems:'flex-start'}}>
-                                <div style={{fontSize: '0.85rem', color: '#666', marginBottom:'2px'}}>Incident Title</div>
-                                <label style={{fontSize:'1.1rem'}}>{data.title}</label>
+                <div className="content">
+                    {filtered.length === 0 && (
+                        <p className="empty-msg">
+                            {results.length === 0
+                                ? 'No incidents found. Try "Show All" or search by location.'
+                                : 'No Hyderabad-related incidents. Turn off "Hyderabad only" to see all.'}
+                        </p>
+                    )}
+                    {filtered.map((d) => (
+                        <div className="incident-card" key={d.id}>
+                            <div className="incident-card-header">
+                                <h3 className="incident-title">{d.title || '—'}</h3>
+                                <span
+                                    className={`severity-badge ${d.severity === 'High' || d.severity === 'Critical' ? 'high' : 'low'}`}
+                                >
+                                    {d.severity || '—'}
+                                </span>
                             </div>
-                            <div className='div2' style={{display:'flex', flexDirection:'column', alignItems:'flex-start', gap:'10px', marginTop:'10px'}}>
-                                <div>
-                                    <div style={{fontSize: '0.85rem', color: '#666', fontWeight:'600'}}>Location</div>
-                                    <div style={{fontSize: '1rem'}}>{data.location}</div>
+                            <div className="incident-card-body">
+                                <div className="incident-field">
+                                    <span className="field-label">Location</span>
+                                    <span className="field-value">{d.location || '—'}</span>
                                 </div>
-                                <div>
-                                    <div style={{fontSize: '0.85rem', color: '#666', fontWeight:'600'}}>Incident Type</div>
-                                    <div style={{fontSize: '1rem'}}>{data.type}</div>
+                                <div className="incident-field">
+                                    <span className="field-label">Type</span>
+                                    <span className="field-value">{d.type || '—'}</span>
                                 </div>
-                                <div>
-                                    <div style={{fontSize: '0.85rem', color: '#666', fontWeight:'600', marginBottom:'2px'}}>Severity</div>
-                                    <span className={data.severity === 'High' || data.severity === 'Critical' ? 'status-inactive' : 'status-active'} 
-                                          style={{padding: '2px 10px', borderRadius: '12px', fontSize: '0.9rem', display:'inline-block'}}>
-                                        {data.severity}
-                                    </span>
+                                <div className="incident-field">
+                                    <span className="field-label">Description</span>
+                                    <p className="field-value description">{d.description || '—'}</p>
                                 </div>
-                            </div>
-                            <div className='div3' style={{marginTop:'15px'}}>
-                                <div style={{fontSize: '0.85rem', color: '#666', fontWeight:'600'}}>Description</div>
-                                <p style={{marginTop:'2px', fontSize:'0.95rem'}}>{data.description}</p>
                             </div>
                         </div>
                     ))}
                 </div>
             </div>
-        )
+        );
     }
 }
 
-export default TrafficSearch
+export default TrafficSearch;

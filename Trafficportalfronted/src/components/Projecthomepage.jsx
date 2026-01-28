@@ -196,7 +196,7 @@ const Projecthomepage = () => {
       <footer className="footer">
         <div>TrafficPortal</div>
         <div>Copyright © 2026 All rights reserved</div>
-        <div>Powered By SITE123 - Free website builder</div>
+        <div>Gurivi redd yasaswini</div>
       </footer>
 
       {/* Glassmorphism Modal Overlay */}

@@ -7,6 +7,7 @@ import TrafficSearch from './TrafficSearch';
 import TrafficPosting from './TrafficPosting';
 import Maintenance from './Maintenance';
 import RouteOptimization from './RouteOptimization';
+import AISmartZonesMap from './AISmartZonesMap';
 import Profile from './Profile';
 import { ADMIN_MENU, DRIVER_MENU } from './MenuConstants';
 import { BASEURL, callApi } from '../api';
@@ -310,6 +311,8 @@ export default class AdminDashboard extends Component {
                             </div>
                         </div>
                     );
+                case 'ai_smart_zones':
+                    return <AISmartZonesMap />;
                 case 'maintenance':
                     return <Maintenance role={role} userid={userid} />;
                 case 'incident_search':

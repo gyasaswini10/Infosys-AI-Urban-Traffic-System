@@ -7,6 +7,7 @@ import { MANAGER_MENU } from './MenuConstants';
 import RouteOptimization from './RouteOptimization';
 import Maintenance from './Maintenance';
 import TrafficDashboard from './TrafficDashboard';
+import AISmartZonesMap from './AISmartZonesMap';
 import Profile from './Profile';
 
 export default class FleetManagerDashboard extends Component {
@@ -103,6 +104,8 @@ export default class FleetManagerDashboard extends Component {
                 );
             case 'ai_routes':
                 return <RouteOptimization />;
+            case 'ai_smart_zones':
+                return <AISmartZonesMap />;
             case 'drivers':
                 return (
                     <div className="tab-content">
