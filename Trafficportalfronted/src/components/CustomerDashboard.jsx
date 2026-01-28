@@ -9,6 +9,7 @@ import RouteOptimization from './RouteOptimization';
 import TrafficPosting from './TrafficPosting';
 import TrafficSearch from './TrafficSearch';
 import AISmartZonesMap from './AISmartZonesMap';
+import RoutePlanner from './RoutePlanner';
 import Profile from './Profile';
 import {
   Chart as ChartJS,
@@ -206,6 +207,8 @@ export default class CustomerDashboard extends Component {
             case 'eco_routes':
                  // Re-using route optimizer but we could pass a prop to pre-select 'eco'
                  return <RouteOptimization defaultMode="eco" />;
+            case 'route_planner':
+                return <RoutePlanner />;
             case 'ai_smart_zones':
                 return <AISmartZonesMap />;
             case 'profile':

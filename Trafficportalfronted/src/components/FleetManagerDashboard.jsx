@@ -8,6 +8,7 @@ import RouteOptimization from './RouteOptimization';
 import Maintenance from './Maintenance';
 import TrafficDashboard from './TrafficDashboard';
 import AISmartZonesMap from './AISmartZonesMap';
+import RoutePlanner from './RoutePlanner';
 import Profile from './Profile';
 
 export default class FleetManagerDashboard extends Component {
@@ -104,6 +105,8 @@ export default class FleetManagerDashboard extends Component {
                 );
             case 'ai_routes':
                 return <RouteOptimization />;
+            case 'route_planner':
+                return <RoutePlanner />;
             case 'ai_smart_zones':
                 return <AISmartZonesMap />;
             case 'drivers':

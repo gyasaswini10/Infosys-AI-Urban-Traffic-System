@@ -13,12 +13,13 @@ export const ADMIN_MENU = [
 export const MANAGER_MENU = [
     { mid: 1, menu: "Fleet Dashboard", icon: "/images/fleet.png", view: "fleet_dashboard" },
     { mid: 2, menu: "AI Routes", icon: "/images/route.png", view: "ai_routes" },
-    { mid: 3, menu: "AI Smart Zones", icon: "/images/location.png", view: "ai_smart_zones" },
-    { mid: 4, menu: "Drivers", icon: "/images/driver.png", view: "drivers" },
-    { mid: 5, menu: "Maintenance", icon: "/images/maintenance.png", view: "maintenance" },
-    { mid: 6, menu: "Traffic View", icon: "/images/traffic_view.png", view: "traffic_view" },
-    { mid: 7, menu: "Reports", icon: "/images/report.png", view: "reports" },
-    { mid: 8, menu: "Profile", icon: "/images/profile.png", view: "profile" }
+    { mid: 3, menu: "Route Planner", icon: "/images/route.png", view: "route_planner" },
+    { mid: 4, menu: "AI Smart Zones", icon: "/images/location.png", view: "ai_smart_zones" },
+    { mid: 5, menu: "Drivers", icon: "/images/driver.png", view: "drivers" },
+    { mid: 6, menu: "Maintenance", icon: "/images/maintenance.png", view: "maintenance" },
+    { mid: 7, menu: "Traffic View", icon: "/images/traffic_view.png", view: "traffic_view" },
+    { mid: 8, menu: "Reports", icon: "/images/report.png", view: "reports" },
+    { mid: 9, menu: "Profile", icon: "/images/profile.png", view: "profile" }
 ];
 
 export const DRIVER_MENU = [

@@ -75,16 +75,185 @@ const LEVEL_COLORS = {
     low: { stroke: '#16a34a' },
 };
 
-function generateZones(center, timeSlot) {
-    const slot = LEVELS_AND_TIPS[timeSlot] || LEVELS_AND_TIPS.morning;
-    return ZONE_TEMPLATES.map((t, i) => {
-        const { level, tip } = slot[i] || slot[0];
+function generateDynamicCongestionLevel(location, timeSlot, zoneName, currentHour = null) {
+    const hour = currentHour || new Date().getHours();
+    const isWeekend = new Date().getDay() === 0 || new Date().getDay() === 6;
+    
+    console.log(`Processing location: "${location}" for zone: "${zoneName}"`); // Debug log
+    
+    // Location-based factors from searched location
+    const locationLower = location.toLowerCase();
+    const isMetroCity = locationLower.includes('mumbai') || locationLower.includes('delhi') || 
+                        locationLower.includes('bangalore') || locationLower.includes('hyderabad') ||
+                        locationLower.includes('chennai') || locationLower.includes('kolkata') ||
+                        locationLower.includes('pune') || locationLower.includes('ahmedabad');
+    
+    const isTier2City = locationLower.includes('lucknow') || locationLower.includes('jaipur') ||
+                       locationLower.includes('chandigarh') || locationLower.includes('indore') ||
+                       locationLower.includes('coimbatore') || locationLower.includes('kochi');
+    
+    console.log(`Location analysis - isMetroCity: ${isMetroCity}, isTier2City: ${isTier2City}`); // Debug log
+    
+    // Zone type detection
+    const isDowntown = zoneName.toLowerCase().includes('central') || zoneName.toLowerCase().includes('downtown');
+    const isTransitHub = zoneName.toLowerCase().includes('transit') || zoneName.toLowerCase().includes('hub');
+    const isCommercial = zoneName.toLowerCase().includes('mall') || zoneName.toLowerCase().includes('market');
+    const isResidential = zoneName.toLowerCase().includes('residential') || zoneName.toLowerCase().includes('south');
+    
+    // Base congestion probability based on city type
+    let congestionProbability = isMetroCity ? 0.5 : isTier2City ? 0.35 : 0.25;
+    
+    console.log(`Base congestion probability: ${congestionProbability}`); // Debug log
+    
+    // Adjust for time slot
+    switch (timeSlot) {
+        case 'morning':
+            congestionProbability += isWeekend ? 0.1 : 0.3;
+            if (hour >= 7 && hour <= 9) congestionProbability += 0.2;
+            break;
+        case 'midday':
+            congestionProbability += 0.15;
+            if (hour >= 12 && hour <= 14) congestionProbability += 0.1;
+            break;
+        case 'evening':
+            congestionProbability += isWeekend ? 0.2 : 0.35;
+            if (hour >= 17 && hour <= 19) congestionProbability += 0.2;
+            break;
+        case 'night':
+            congestionProbability -= 0.1;
+            if (hour >= 22 || hour <= 6) congestionProbability -= 0.1;
+            break;
+    }
+    
+    // Adjust for location type
+    if (isDowntown) congestionProbability += isMetroCity ? 0.25 : 0.15;
+    if (isTransitHub) congestionProbability += isMetroCity ? 0.2 : 0.1;
+    if (isCommercial && timeSlot === 'midday') congestionProbability += 0.15;
+    if (isResidential && (timeSlot === 'morning' || timeSlot === 'evening')) congestionProbability += 0.1;
+    
+    // Add location-specific modifiers
+    if (locationLower.includes('mumbai')) {
+        congestionProbability += 0.1; // Mumbai typically has higher traffic
+        console.log('Mumbai detected, adding 0.1 to congestion'); // Debug log
+    } else if (locationLower.includes('bangalore')) {
+        congestionProbability += 0.05; // Bangalore has moderate traffic
+        console.log('Bangalore detected, adding 0.05 to congestion'); // Debug log
+    } else if (locationLower.includes('hyderabad')) {
+        congestionProbability += 0.08; // Hyderabad traffic patterns
+        console.log('Hyderabad detected, adding 0.08 to congestion'); // Debug log
+    }
+    
+    // Add randomness for realism but ensure location changes create different patterns
+    const locationSeed = location.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const randomFactor = Math.sin(locationSeed + zoneName.length + hour) * 0.1;
+    congestionProbability += randomFactor;
+    
+    congestionProbability = Math.max(0.1, Math.min(0.9, congestionProbability));
+    
+    console.log(`Final congestion probability for ${zoneName}: ${congestionProbability}`); // Debug log
+    
+    // Determine level based on probability
+    if (congestionProbability > 0.65) return 'high';
+    if (congestionProbability > 0.35) return 'moderate';
+    return 'low';
+}
+
+function generateDynamicTip(location, timeSlot, zoneName, level) {
+    const locationLower = location.toLowerCase();
+    const isMetroCity = locationLower.includes('mumbai') || locationLower.includes('delhi') || 
+                        locationLower.includes('bangalore') || locationLower.includes('hyderabad');
+    
+    const isDowntown = zoneName.toLowerCase().includes('central') || zoneName.toLowerCase().includes('downtown');
+    const isTransitHub = zoneName.toLowerCase().includes('transit') || zoneName.toLowerCase().includes('hub');
+    const currentHour = new Date().getHours();
+    
+    // Location-specific tip templates
+    const citySpecificTips = {
+        mumbai: {
+            high: [
+                `AI: ${zoneName} - Mumbai's notorious traffic. Use local trains if possible.`,
+                `AI: ${zoneName} - Expect 30-45 min delays. Consider Western/Eastern Express Highway.`,
+                `AI: ${zoneName} - Peak Mumbai traffic. BEST buses or metro recommended.`
+            ],
+            moderate: [
+                `AI: ${zoneName} - Moderate Mumbai traffic. Allow extra 15-20 minutes.`,
+                `AI: ${zoneName} - Typical Mumbai flow. Use flyovers to save time.`
+            ],
+            low: [
+                `AI: ${zoneName} - Clear for Mumbai standards. Quick transit expected.`,
+                `AI: ${zoneName} - Unusually light Mumbai traffic. Optimal conditions.`
+            ]
+        },
+        delhi: {
+            high: [
+                `AI: ${zoneName} - Delhi peak traffic. Use Delhi Metro or Ring Road.`,
+                `AI: ${zoneName} - Heavy congestion. Avoid ITO and AIIMS area if possible.`,
+                `AI: ${zoneName} - Delhi rush hour. Consider Gurgaon/Noida Expressway.`
+            ],
+            moderate: [
+                `AI: ${zoneName} - Moderate Delhi traffic. Use BRT corridors where available.`,
+                `AI: ${zoneName} - Typical Delhi conditions. Plan for 15 min delays.`
+            ],
+            low: [
+                `AI: ${zoneName} - Light Delhi traffic. Good time for Connaught Place.`,
+                `AI: ${zoneName} - Clear roads. Optimal for Delhi travel.`
+            ]
+        },
+        default: {
+            high: [
+                `AI: ${zoneName} experiencing heavy traffic. Delay of 20-35 minutes likely.`,
+                `AI: Avoid ${zoneName} if possible. Use ring roads or bypass routes.`,
+                `AI: Peak traffic in ${zoneName}. Carpooling or transit recommended.`,
+                `AI: Severe congestion in ${zoneName}. Consider alternate routes.`
+            ],
+            moderate: [
+                `AI: Moderate traffic in ${zoneName}. Allow extra 10-15 minutes.`,
+                `AI: ${zoneName} has steady flow. Minor delays possible.`,
+                `AI: Light congestion in ${zoneName}. Traffic moving well.`,
+                `AI: Normal conditions in ${zoneName}. No major issues.`
+            ],
+            low: [
+                `AI: Clear roads in ${zoneName}. Optimal travel conditions.`,
+                `AI: Light traffic in ${zoneName}. Quick transit expected.`,
+                `AI: ${zoneName} is congestion-free. Best time to travel.`,
+                `AI: Smooth flow in ${zoneName}. No delays anticipated.`
+            ]
+        }
+    };
+    
+    // Get city-specific tips or default
+    let tipSet = citySpecificTips.default;
+    for (const [city, tips] of Object.entries(citySpecificTips)) {
+        if (locationLower.includes(city)) {
+            tipSet = tips;
+            break;
+        }
+    }
+    
+    const levelTips = tipSet[level] || tipSet.low;
+    return levelTips[Math.floor(Math.random() * levelTips.length)];
+}
+
+function generateZones(center, timeSlot, location = '') {
+    console.log('Generating zones for location:', location, 'timeSlot:', timeSlot); // Debug log
+    
+    return ZONE_TEMPLATES.map((t) => {
+        const level = generateDynamicCongestionLevel(location, timeSlot, t.name);
+        const tip = generateDynamicTip(location, timeSlot, t.name, level);
+        
+        console.log(`Zone ${t.name}: level=${level}, location=${location}`); // Debug log
+        
+        // Dynamic radius based on congestion level
+        let radius = t.radius;
+        if (level === 'high') radius *= 1.2;
+        if (level === 'low') radius *= 0.8;
+        
         return {
             id: t.id,
             center: [center[0] + t.offset[0], center[1] + t.offset[1]],
             name: t.name,
             level,
-            radius: t.radius,
+            radius,
             tip,
         };
     });
@@ -122,20 +291,56 @@ export default function AISmartZonesMap() {
     const [searchQuery, setSearchQuery] = useState('');
     const [searching, setSearching] = useState(false);
     const [searchError, setSearchError] = useState('');
+    const [currentLocation, setCurrentLocation] = useState('Hyderabad'); // Initialize with default location
+    const [lastUpdate, setLastUpdate] = useState(new Date());
+    const [zones, setZones] = useState([]); // Direct state instead of useMemo
 
-    const zones = useMemo(
-        () => generateZones(zonesCenter, timeSlot),
-        [zonesCenter, timeSlot]
-    );
+    // Update zones every 30 seconds for real-time feel
+    React.useEffect(() => {
+        const interval = setInterval(() => {
+            setLastUpdate(new Date());
+        }, 30000);
+        return () => clearInterval(interval);
+    }, []);
+
+    // Generate zones whenever location, timeSlot, or lastUpdate changes
+    React.useEffect(() => {
+        console.log('Regenerating zones due to location/time/update change');
+        console.log('Current params:', { zonesCenter, timeSlot, currentLocation });
+        const newZones = generateZones(zonesCenter, timeSlot, currentLocation);
+        setZones(newZones);
+    }, [zonesCenter, timeSlot, currentLocation, lastUpdate]);
+
+    // Initialize zones on mount
+    React.useEffect(() => {
+        console.log('Initializing zones on mount');
+        const initialZones = generateZones(zonesCenter, timeSlot, currentLocation);
+        setZones(initialZones);
+    }, []); // Only run once on mount
+
     const highCount = zones.filter((z) => z.level === 'high').length;
     const moderateCount = zones.filter((z) => z.level === 'moderate').length;
     const lowCount = zones.filter((z) => z.level === 'low').length;
-    const bestTime =
-        timeSlot === 'midday' || timeSlot === 'night'
-            ? timeSlot === 'midday'
-                ? '10 AM – 4 PM'
-                : '8 PM – 7 AM'
-            : 'Avoid peak windows';
+    
+    // Dynamic best time recommendation based on current conditions
+    const getBestTimeRecommendation = () => {
+        const currentHour = new Date().getHours();
+        const isWeekend = new Date().getDay() === 0 || new Date().getDay() === 6;
+        
+        if (highCount > moderateCount + lowCount) {
+            return 'Avoid peak hours - try midday or night';
+        } else if (lowCount > highCount + moderateCount) {
+            return 'Current conditions optimal for travel';
+        } else if (currentHour >= 7 && currentHour <= 9) {
+            return 'Wait until after 9:30 AM for better flow';
+        } else if (currentHour >= 17 && currentHour <= 19) {
+            return 'Travel after 7:30 PM or before 4:30 PM';
+        } else {
+            return 'Current time is good for travel';
+        }
+    };
+    
+    const bestTime = getBestTimeRecommendation();
 
     const handleSearch = useCallback(async () => {
         const q = searchQuery.trim();
@@ -150,6 +355,9 @@ export default function AISmartZonesMap() {
             if (coords) {
                 setMapCenter(coords);
                 setZonesCenter(coords);
+                setCurrentLocation(q); // Set location for dynamic generation
+                setLastUpdate(new Date()); // Force immediate update
+                console.log('Location changed to:', q); // Debug log
             } else {
                 setSearchError('Location not found. Try another search.');
             }
@@ -212,6 +420,10 @@ export default function AISmartZonesMap() {
 
                 <div className="ai-summary-card">
                     <h4>AI Summary</h4>
+                    <div className="real-time-indicator">
+                        <span className="live-dot"></span>
+                        <span className="update-text">Live • Updated {lastUpdate.toLocaleTimeString()}</span>
+                    </div>
                     <div className="summary-stats">
                         <div className="summary-row high">
                             <span className="dot" />
