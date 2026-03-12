@@ -1,3 +1,10 @@
+[YASASWINI INDIVIDUAL REPORT .pdf](https://github.com/user-attachments/files/25931077/YASASWINI.INDIVIDUAL.REPORT.pdf)
+
+
+
+
+
+
 Infosys Springboard Virtual Internship 6.0 Completion Report
 Project Title
 NeuroFleetX – AI-Driven Urban Mobility Optimization System
